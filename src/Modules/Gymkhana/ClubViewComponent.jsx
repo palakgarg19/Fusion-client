@@ -8,6 +8,8 @@ import "mantine-react-table/styles.css";
 
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
 const CustomTable = lazy(() => import("./CustomTable"));
+const EventForm = lazy(() => import("./EventForm"));
+const BudgetForm = lazy(() => import("./BudgetForm"));
 function ClubViewComponent({
   clubName,
   membersData,
@@ -68,13 +70,23 @@ function ClubViewComponent({
           </Suspense>
         );
       case "EventsApprovalForm":
-        return <div>Coordinator Events Approval Form Component</div>;
+        return (
+          <Suspense fallback={<div>Loading Events Approval Form...</div>}>
+            <EventForm clubName={clubName} />
+          </Suspense>
+        );
       case "BudgetApprovalForm":
-        return <div>Coordinator Budget Form Component</div>;
+        return (
+          <Suspense fallback={<div>Loading Budget Approval Form...</div>}>
+            <BudgetForm clubName={clubName} />
+          </Suspense>
+        );
       default:
         return (
-          <Stack align="content-center">
-            <RegistrationForm clubName={clubName} />
+          <Stack align="center">
+            <Suspense fallback={<div>Loading Registration Form...</div>}>
+              <RegistrationForm clubName={clubName} />
+            </Suspense>
           </Stack>
         );
     }
