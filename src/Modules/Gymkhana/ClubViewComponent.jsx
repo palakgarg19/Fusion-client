@@ -176,14 +176,14 @@ ClubViewComponent.propTypes = {
   achievementsData: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.string.isRequired,
-      year: PropTypes.string.isRequired,
+      year: PropTypes.string.isRequired, // Assuming year is a string, e.g., "2022"
     }),
   ).isRequired,
 
   eventsData: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired, // Assuming date is a string in "YYYY-MM-DD" format
     }),
   ).isRequired,
 
