@@ -20,7 +20,7 @@ function ClubRegistrationForm() {
       name: (value) =>
         value.length < 2 ? "First name must have at least 2 letters" : null,
       rollNumber: (value) =>
-        value.length < 2 ? "Roll no must have at least 8 letters" : null,
+        value.length < 8 ? "Roll no must have at least 8 letters" : null,
       email: (value) => (isEmail(value) ? null : "Invalid email format"),
     },
   });
