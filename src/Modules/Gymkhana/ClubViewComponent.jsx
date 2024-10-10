@@ -123,7 +123,7 @@ function ClubViewComponent({
             <Tabs.List>
               <Tabs.Tab value="About">About</Tabs.Tab>
 
-              {user.role === "co-ordinator" || user.role === "FIC" ? (
+              {user.role === "co-ordinator" ? (
                 <Tabs.Tab value="Members_co-ordinator">Members</Tabs.Tab>
               ) : (
                 <Tabs.Tab value="Members">Members</Tabs.Tab>
@@ -134,23 +134,21 @@ function ClubViewComponent({
               ) : (
                 <Tabs.Tab value="Events">Events</Tabs.Tab>
               )}
-              {user.role !== "co-ordinator" ||
-                (user.role !== "FIC" && (
-                  <Tabs.Tab value="Register">Register</Tabs.Tab>
-                ))}
-              {user.role === "co-ordinator" ||
-                (user.role === "FIC" && (
-                  <>
-                    <Tabs.Tab value="EventsApproval">Event Approval</Tabs.Tab>
-                    <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
-                    <Tabs.Tab value="EventsApprovalForm">
-                      Events approval Form
-                    </Tabs.Tab>
-                    <Tabs.Tab value="BudgetApprovalForm">
-                      Budget approval Form
-                    </Tabs.Tab>
-                  </>
-                ))}
+              {user.role !== "co-ordinator" && (
+                <Tabs.Tab value="Register">Register</Tabs.Tab>
+              )}
+              {user.role === "co-ordinator" && (
+                <>
+                  <Tabs.Tab value="EventsApproval">Event Approval</Tabs.Tab>
+                  <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
+                  <Tabs.Tab value="EventsApprovalForm">
+                    Events approval Form
+                  </Tabs.Tab>
+                  <Tabs.Tab value="BudgetApprovalForm">
+                    Budget approval Form
+                  </Tabs.Tab>
+                </>
+              )}
             </Tabs.List>
           </Tabs>
         </Group>
