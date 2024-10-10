@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import { useSelector } from "react-redux";
 import {
+  Box,
   Button,
   Container,
   Group,
@@ -9,7 +10,8 @@ import {
   Tabs,
   Text,
 } from "@mantine/core";
-import ClubViewComponent from "./ClubViewComponent";
+
+const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
 
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
@@ -39,7 +41,7 @@ function GymkhanaDashboard() {
               w="220px"
             />
           </Group>
-          <Container mt="10px" mx="0" my="xs">
+          <Box mt="30px" mx="30px" px="30px" mb="xs" w="78vw">
             {value === "Select a Club" ? (
               <Paper shadow="md" p="xl" h="80vh" w="80vw" ml="20px">
                 <Container>
@@ -100,38 +102,40 @@ function GymkhanaDashboard() {
                 </Container>
               </Paper>
             ) : (
-              <ClubViewComponent
-                clubName={value}
-                membersData={[
-                  { name: "John Doe", role: "President" },
-                  { name: "Jane Smith", role: "Vice President" },
-                  // add more members here
-                ]}
-                achievementsData={[
-                  { title: "First Place at Hackathon", year: "2022" },
-                  { title: "Best Club Award", year: "2023" },
-                  // add more achievements here
-                ]}
-                eventsData={[
-                  { name: "Coding Bootcamp", date: "2024-01-15" },
-                  { name: "Tech Fest", date: "2024-03-10" },
-                  // add more events here
-                ]}
-                membersColumns={[
-                  { accessorKey: "name", header: "Name" },
-                  { accessorKey: "role", header: "Role" },
-                ]}
-                achievementsColumns={[
-                  { accessorKey: "title", header: "Title" },
-                  { accessorKey: "year", header: "Year" },
-                ]}
-                eventsColumns={[
-                  { accessorKey: "name", header: "Event Name" },
-                  { accessorKey: "date", header: "Date" },
-                ]}
-              />
+              <Suspense fallback={<div>Loading .......</div>}>
+                <ClubViewComponent
+                  clubName={value}
+                  membersData={[
+                    { name: "John Doe", role: "President" },
+                    { name: "Jane Smith", role: "Vice President" },
+                    // add more members here
+                  ]}
+                  achievementsData={[
+                    { title: "First Place at Hackathon", year: "2022" },
+                    { title: "Best Club Award", year: "2023" },
+                    // add more achievements here
+                  ]}
+                  eventsData={[
+                    { name: "Coding Bootcamp", date: "2024-01-15" },
+                    { name: "Tech Fest", date: "2024-03-10" },
+                    // add more events here
+                  ]}
+                  membersColumns={[
+                    { accessorKey: "name", header: "Name" },
+                    { accessorKey: "role", header: "Role" },
+                  ]}
+                  achievementsColumns={[
+                    { accessorKey: "title", header: "Title" },
+                    { accessorKey: "year", header: "Year" },
+                  ]}
+                  eventsColumns={[
+                    { accessorKey: "name", header: "Event Name" },
+                    { accessorKey: "date", header: "Date" },
+                  ]}
+                />
+              </Suspense>
             )}
-          </Container>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="Calender" h="100vh">
