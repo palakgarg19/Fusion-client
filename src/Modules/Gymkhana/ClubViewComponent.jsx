@@ -91,7 +91,6 @@ function ClubViewComponent({
         );
     }
   };
-
   return (
     <Container style={{ height: "100vh", width: "100vw" }}>
       {" "}
@@ -123,7 +122,7 @@ function ClubViewComponent({
               {user.role === "co-ordinator" && (
                 <>
                   <Tabs.Tab value="EventsApproval">Event Approval</Tabs.Tab>
-                  <Tabs.Tab value="BudgetApproval">Budget Approval</Tabs.Tab>
+                  <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
                   <Tabs.Tab value="EventsApprovalForm">
                     Events approval Form
                   </Tabs.Tab>
