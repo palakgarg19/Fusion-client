@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "mantine-react-table/styles.css";
+import EventApprovalsWithProviders from "./ApprovalsTable";
 
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
 const CustomTable = lazy(() => import("./CustomTable"));
@@ -47,7 +48,11 @@ function ClubViewComponent({
       case "Members":
         return (
           <Suspense fallback={<div>Loading Members Table</div>}>
-            <CustomTable data={membersData} columns={membersColumns} />;
+            <CustomTable
+              data={membersData}
+              columns={membersColumns}
+              TableName="Members"
+            />
           </Suspense>
         );
       case "Achievements":
@@ -68,15 +73,19 @@ function ClubViewComponent({
       case "EventsApproval":
         return (
           <Suspense fallback={<div>Loading Table component</div>}>
-            <CustomTable data={eventsData} columns={eventsColumns} />
+            <EventApprovalsWithProviders />
           </Suspense>
         );
       case "BudgetApproval":
-        return <div>Budget approval dashboard page</div>;
+        return (
+          <Suspense fallback={<div>Loading Table component</div>}>
+            <EventApprovalsWithProviders />
+          </Suspense>
+        );
       case "Members_co-ordinator":
         return (
           <Suspense fallback={<div>Loading Members Table</div>}>
-            <CustomTable data={membersData} columns={membersColumns} />;
+            <CustomTable data={membersData} columns={membersColumns} />
             {/* need to make query prop wghich would filter the data if required  */}
           </Suspense>
         );
@@ -140,7 +149,7 @@ function ClubViewComponent({
               )}
               {user.role === "co-ordinator" && (
                 <>
-                  <Tabs.Tab value="EventsApproval">Event Approval</Tabs.Tab>
+                  <Tabs.Tab value="EventsApproval">EventsAPproval</Tabs.Tab>
                   <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
                   <Tabs.Tab value="EventsApprovalForm">
                     Events approval Form
@@ -169,6 +178,7 @@ ClubViewComponent.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       role: PropTypes.string.isRequired,
+      roleNo: PropTypes.string.isRequired,
     }),
   ).isRequired,
 
