@@ -12,7 +12,7 @@ import {
 import { Divider, Flex, Stack, Table, Title } from "@mantine/core";
 import PropTypes from "prop-types";
 
-function CustomTable({ data, columns }) {
+function CustomTable({ data, columns, TableName }) {
   const table = useMantineReactTable({
     columns,
     data,
@@ -31,7 +31,7 @@ function CustomTable({ data, columns }) {
   return (
     <Stack>
       <Divider />
-      <Title order={4}>My Custom Headless Table</Title>
+      <Title order={4}>{TableName} Table</Title>
       <Flex justify="space-between" align="center">
         {/* eslint-disable-next-line react/jsx-pascal-case */}
         <MRT_GlobalFilterTextInput table={table} />
@@ -96,6 +96,7 @@ CustomTable.propTypes = {
       header: PropTypes.string.isRequired,
     }),
   ).isRequired,
+  TableName: PropTypes.string.isRequired,
 };
 
 export default CustomTable;

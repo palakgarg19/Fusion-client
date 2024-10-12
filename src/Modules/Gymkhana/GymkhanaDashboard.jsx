@@ -2,7 +2,6 @@ import { useState, Suspense, lazy } from "react";
 import { useSelector } from "react-redux";
 import {
   Box,
-  Button,
   Container,
   Group,
   Paper,
@@ -10,14 +9,156 @@ import {
   Tabs,
   Text,
 } from "@mantine/core";
+import dayjs from "dayjs";
+
+import ClubFilter from "./calender/ClubFilter";
+import DateSelector from "./calender/DateSelector";
+import EventCalendar from "./calender/EventCalender";
+import EventCard from "./calender/EventCard";
+import CustomTable from "./CustomTable";
+import { festColumns, festData } from "./makeData";
 
 const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
+const events = [
+  {
+    date: dayjs("2024-10-05"),
+    name: "AFC Event 1",
+    time: "10:00 AM",
+    details: "Details about AFC Event 1",
+    color: "#81c784",
+    club: "AFC",
+  }, // Darker Green
+  {
+    date: dayjs("2024-11-08"),
+    name: "AFC Event 2",
+    time: "1:00 PM",
+    details: "Details about AFC Event 2",
+    color: "#81c784",
+    club: "AFC",
+  },
+  {
+    date: dayjs("2024-10-11"),
+    name: "AFC Event 3",
+    time: "3:00 PM",
+    details: "Details about AFC Event 3",
+    color: "#81c784",
+    club: "AFC",
+  },
+  {
+    date: dayjs("2024-11-22"),
+    name: "AFC Event 4",
+    time: "5:00 PM",
+    details: "Details about AFC Event 4",
+    color: "#81c784",
+    club: "AFC",
+  },
 
+  {
+    date: dayjs("2024-10-08"),
+    name: "TPC Event 1",
+    time: "2:00 PM",
+    details: "Details about TPC Event 1",
+    color: "#64b5f6",
+    club: "TPC",
+  }, // Darker Blue
+  {
+    date: dayjs("2024-12-05"),
+    name: "TPC Event 2",
+    time: "11:00 AM",
+    details: "Details about TPC Event 2",
+    color: "#64b5f6",
+    club: "TPC",
+  },
+  {
+    date: dayjs("2024-10-13"),
+    name: "TPC Event 3",
+    time: "4:30 PM",
+    details: "Details about TPC Event 3",
+    color: "#64b5f6",
+    club: "TPC",
+  },
+  {
+    date: dayjs("2024-11-24"),
+    name: "TPC Event 4",
+    time: "9:00 AM",
+    details: "Details about TPC Event 4",
+    color: "#64b5f6",
+    club: "TPC",
+  },
+
+  {
+    date: dayjs("2024-10-18"),
+    name: "BMC Event 1",
+    time: "10:30 AM",
+    details: "Details about BMC Event 1",
+    color: "#ef5350",
+    club: "BMC",
+  }, // Darker Red
+  {
+    date: dayjs("2024-11-09"),
+    name: "BMC Event 2",
+    time: "12:30 PM",
+    details: "Details about BMC Event 2",
+    color: "#ef5350",
+    club: "BMC",
+  },
+  {
+    date: dayjs("2024-11-04"),
+    name: "BMC Event 3",
+    time: "1:00 PM",
+    details: "Details about BMC Event 3",
+    color: "#ef5350",
+    club: "BMC",
+  },
+  {
+    date: dayjs("2024-12-05"),
+    name: "BMC Event 4",
+    time: "3:00 PM",
+    details: "Details about BMC Event 4",
+    color: "#ef5350",
+    club: "BMC",
+  },
+
+  {
+    date: dayjs("2024-10-28"),
+    name: "E-Cell Event 1",
+    time: "4:00 PM",
+    details: "Details about E-Cell Event 1",
+    color: "#ba68c8",
+    club: "E-Cell",
+  }, // Darker Purple
+  {
+    date: dayjs("2024-10-30"),
+    name: "E-Cell Event 2",
+    time: "1:30 PM",
+    details: "Details about E-Cell Event 2",
+    color: "#ba68c8",
+    club: "E-Cell",
+  },
+  {
+    date: dayjs("2024-11-02"),
+    name: "E-Cell Event 3",
+    time: "2:00 PM",
+    details: "Details about E-Cell Event 3",
+    color: "#ba68c8",
+    club: "E-Cell",
+  },
+  {
+    date: dayjs("2024-11-16"),
+    name: "E-Cell Event 4",
+    time: "6:00 PM",
+    details: "Details about E-Cell Event 4",
+    color: "#ba68c8",
+    club: "E-Cell",
+  },
+];
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
   console.log("user", user);
   const [activeTab, setActiveTab] = useState("Clubs");
   const [value, setValue] = useState("Select a Club");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedClub, setSelectedClub] = useState("All Clubs");
   return (
     <>
       <div>
@@ -107,8 +248,49 @@ function GymkhanaDashboard() {
                   AboutClub={`${value} is the club we are talking about `}
                   clubName={value}
                   membersData={[
-                    { name: "John Doe", role: "President" },
-                    { name: "Jane Smith", role: "Vice President" },
+                    {
+                      name: "John Doe",
+                      role: "Coordinator",
+                      rollNo: "22BCS178",
+                    },
+                    {
+                      name: "Jane Smith",
+                      role: "Co-Coordinator",
+                      rollNo: "23BDS002",
+                    },
+                    {
+                      name: "Emily Johnson",
+                      role: "Core Member",
+                      rollNo: "22BCS179",
+                    },
+                    {
+                      name: "Michael Brown",
+                      role: "Core Member",
+                      rollNo: "22BCS180",
+                    },
+                    { name: "Sarah Davis", role: "Member", rollNo: "23BDS003" },
+                    {
+                      name: "David Wilson",
+                      role: "Member",
+                      rollNo: "23BDS004",
+                    },
+                    {
+                      name: "Laura Martinez",
+                      role: "Core Member",
+                      rollNo: "22BCS181",
+                    },
+                    {
+                      name: "James Garcia",
+                      role: "Member",
+                      rollNo: "23BDS005",
+                    },
+                    {
+                      name: "Patricia Rodriguez",
+                      role: "Core Member",
+                      rollNo: "22BCS182",
+                    },
+                    { name: "Daniel Hall", role: "Member", rollNo: "23BDS006" },
+
                     // add more members here
                   ]}
                   achievementsData={[
@@ -140,22 +322,86 @@ function GymkhanaDashboard() {
         </Tabs.Panel>
 
         <Tabs.Panel value="Calender" h="100vh">
-          <Container mt="10px" mx="0" my="xs">
-            <Button>Filter Button</Button>
+          <Container
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              height: "100%",
+              justifyContent: "center",
+              gap: "10px",
+            }}
+          >
+            {/* Left Section */}
+            <Container
+              style={{
+                // Adjust this to ensure it occupies only 1/3 of the width
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "50px",
+                paddingTop: "35px",
+                boxSizing: "border-box", // Ensures padding doesn’t add extra width
+                // overflow: "hidden",
+              }}
+            >
+              <DateSelector
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+              />
+              <EventCard
+                events={events.filter((event) =>
+                  dayjs(event.date).isSame(selectedDate, "day"),
+                )}
+              />
+            </Container>
+
+            {/* Right Section */}
+            <Container
+              style={{
+                // Takes up the remaining space
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                boxSizing: "border-box",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  alignItems: "center",
+                  overflow: "auto", // Ensures no overflow from the calendar header
+                }}
+              >
+                <h2>{dayjs(selectedDate).format("MMMM YYYY")}</h2>
+                <ClubFilter
+                  selectedClub={selectedClub}
+                  setSelectedClub={setSelectedClub}
+                />
+              </div>
+              <EventCalendar
+                selectedDate={selectedDate}
+                selectedClub={selectedClub}
+              />
+            </Container>
           </Container>
-          <Container>Calender Component falls over here</Container>
         </Tabs.Panel>
 
         <Tabs.Panel value="Fests" h="100vh">
           <Container mt="10px" mx="0" my="xs">
-            Previous Fests Component falls over here
+            <Suspense fallback={<div>Loading Fests Table...</div>}>
+              <CustomTable data={festData} columns={festColumns} />
+            </Suspense>
           </Container>
           {/* need to make page where we have previous Fests listed here in Table */}
         </Tabs.Panel>
 
         <Tabs.Panel value="Events" h="100vh">
           <Container mt="10px" mx="0" my="xs">
-            Need to fetch Events from the APIS over here
+            <Suspense fallback={<div>Loading Fests Table...</div>}>
+              <CustomTable data={festData} columns={festColumns} />
+            </Suspense>
           </Container>
           {/* need to make a Table with previous Events in Campus */}
         </Tabs.Panel>
