@@ -1,144 +1,12 @@
 import { useEffect, useState } from "react";
 import { Tooltip } from "@mantine/core";
 import dayjs from "dayjs";
+import PropTypes from "prop-types";
 
-function EventCalendar({ selectedDate, selectedClub }) {
+function EventCalendar({ selectedDate, selectedClub, events }) {
   const [daysInMonth, setDaysInMonth] = useState([]);
 
   // Darker dummy events for demonstration with club tags and assigned colors
-  const events = [
-    {
-      date: dayjs("2024-10-05"),
-      name: "AFC Event 1",
-      time: "10:00 AM",
-      details: "Details about AFC Event 1",
-      color: "#81c784",
-      club: "AFC",
-    }, // Darker Green
-    {
-      date: dayjs("2024-11-08"),
-      name: "AFC Event 2",
-      time: "1:00 PM",
-      details: "Details about AFC Event 2",
-      color: "#81c784",
-      club: "AFC",
-    },
-    {
-      date: dayjs("2024-10-11"),
-      name: "AFC Event 3",
-      time: "3:00 PM",
-      details: "Details about AFC Event 3",
-      color: "#81c784",
-      club: "AFC",
-    },
-    {
-      date: dayjs("2024-11-22"),
-      name: "AFC Event 4",
-      time: "5:00 PM",
-      details: "Details about AFC Event 4",
-      color: "#81c784",
-      club: "AFC",
-    },
-
-    {
-      date: dayjs("2024-10-08"),
-      name: "TPC Event 1",
-      time: "2:00 PM",
-      details: "Details about TPC Event 1",
-      color: "#64b5f6",
-      club: "TPC",
-    }, // Darker Blue
-    {
-      date: dayjs("2024-12-05"),
-      name: "TPC Event 2",
-      time: "11:00 AM",
-      details: "Details about TPC Event 2",
-      color: "#64b5f6",
-      club: "TPC",
-    },
-    {
-      date: dayjs("2024-10-13"),
-      name: "TPC Event 3",
-      time: "4:30 PM",
-      details: "Details about TPC Event 3",
-      color: "#64b5f6",
-      club: "TPC",
-    },
-    {
-      date: dayjs("2024-11-24"),
-      name: "TPC Event 4",
-      time: "9:00 AM",
-      details: "Details about TPC Event 4",
-      color: "#64b5f6",
-      club: "TPC",
-    },
-
-    {
-      date: dayjs("2024-10-18"),
-      name: "BMC Event 1",
-      time: "10:30 AM",
-      details: "Details about BMC Event 1",
-      color: "#ef5350",
-      club: "BMC",
-    }, // Darker Red
-    {
-      date: dayjs("2024-11-09"),
-      name: "BMC Event 2",
-      time: "12:30 PM",
-      details: "Details about BMC Event 2",
-      color: "#ef5350",
-      club: "BMC",
-    },
-    {
-      date: dayjs("2024-11-04"),
-      name: "BMC Event 3",
-      time: "1:00 PM",
-      details: "Details about BMC Event 3",
-      color: "#ef5350",
-      club: "BMC",
-    },
-    {
-      date: dayjs("2024-12-05"),
-      name: "BMC Event 4",
-      time: "3:00 PM",
-      details: "Details about BMC Event 4",
-      color: "#ef5350",
-      club: "BMC",
-    },
-
-    {
-      date: dayjs("2024-10-28"),
-      name: "E-Cell Event 1",
-      time: "4:00 PM",
-      details: "Details about E-Cell Event 1",
-      color: "#ba68c8",
-      club: "E-Cell",
-    }, // Darker Purple
-    {
-      date: dayjs("2024-10-30"),
-      name: "E-Cell Event 2",
-      time: "1:30 PM",
-      details: "Details about E-Cell Event 2",
-      color: "#ba68c8",
-      club: "E-Cell",
-    },
-    {
-      date: dayjs("2024-11-02"),
-      name: "E-Cell Event 3",
-      time: "2:00 PM",
-      details: "Details about E-Cell Event 3",
-      color: "#ba68c8",
-      club: "E-Cell",
-    },
-    {
-      date: dayjs("2024-11-16"),
-      name: "E-Cell Event 4",
-      time: "6:00 PM",
-      details: "Details about E-Cell Event 4",
-      color: "#ba68c8",
-      club: "E-Cell",
-    },
-  ];
 
   useEffect(() => {
     // Calculate the correct number of days in the selected month
@@ -189,20 +57,20 @@ function EventCalendar({ selectedDate, selectedClub }) {
             events
               .filter(
                 (event) =>
-                  day.date.isSame(event.date, "day") &&
+                  day.date.isSame(event.start_date, "day") &&
                   (selectedClub === "All Clubs" || event.club === selectedClub),
               )
               .map((event, idx) => (
                 <Tooltip
                   key={idx}
-                  label={`${event.name}: ${event.details}`}
+                  label={`${event.event_name}: ${event.details}`}
                   withArrow
                   transition="pop"
                   transitionDuration={200}
                 >
                   <div
                     style={{
-                      backgroundColor: event.color,
+                      backgroundColor: "black",
                       padding: "5px 10px",
                       margin: "5px 0",
                       color: "#fff",
@@ -210,7 +78,7 @@ function EventCalendar({ selectedDate, selectedClub }) {
                       fontSize: "14px", // Font size for event card
                     }}
                   >
-                    {event.time} {event.name}
+                    {event.start_time} {event.event_name}
                   </div>
                 </Tooltip>
               ))}
@@ -219,5 +87,16 @@ function EventCalendar({ selectedDate, selectedClub }) {
     </div>
   );
 }
-
+EventCalendar.propTypes = {
+  selectedClub: PropTypes.string,
+  selectedDate: PropTypes.string,
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      start_time: PropTypes.string,
+      end_time: PropTypes.string,
+      start_date: PropTypes.string,
+      end_date: PropTypes.string,
+    }),
+  ),
+};
 export default EventCalendar;

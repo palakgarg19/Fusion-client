@@ -1,19 +1,32 @@
 import React from "react";
 import { useForm, isEmail } from "@mantine/form";
-import { TextInput, Textarea, Button, Group, Container } from "@mantine/core";
+import {
+  TextInput,
+  Textarea,
+  Button,
+  Group,
+  Container,
+  Alert,
+} from "@mantine/core";
 
 import "./GymkhanaForms.css";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
+import { Mutation, useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
-function ClubRegistrationForm() {
+const token = localStorage.getItem("authToken");
+function ClubRegistrationForm({ clubName }) {
   // Set up the form with initial values and validation
+  const user = useSelector((state) => state.user);
   const form = useForm({
     initialValues: {
-      name: "",
+      name: user.username,
       rollNumber: null,
       email: "",
       achievements: "",
       experience: "",
+      club: clubName,
     },
 
     validate: {
@@ -24,11 +37,34 @@ function ClubRegistrationForm() {
       email: (value) => (isEmail(value) ? null : "Invalid email format"),
     },
   });
-
+  // TODO need to add logic for addition to DB
+  const mutation = useMutation({
+    mutationFn: (newMemberData) => {
+      return axios.post(
+        "http://localhost:8000/gymkhana/api/club_membership/",
+        newMemberData,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }, // Replace with your actual API endpoint
+      );
+    },
+  });
   // Submit handler
   const handleSubmit = (values) => {
-    console.log("Form submitted:", values);
-    // Add your submission logic here
+    mutation.mutate(values, {
+      onSuccess: (response) => {
+        // Handle success (you can redirect or show a success message)
+        console.log("Successfully registered:", response.data);
+        Alert("Registration successful!");
+      },
+      onError: (error) => {
+        // Handle error (you can show an error message)
+        console.error("Error during registration:", error);
+        Alert("Registration failed. Please try again.");
+      },
+    });
   };
 
   return (
@@ -92,9 +128,11 @@ function ClubRegistrationForm() {
 
         {/* Submit Button */}
         <Group position="center" mt="md">
-          <Button type="submit" className="submit-btn">
-            Submit
-          </Button>
+          {token && (
+            <Button type="submit" className="submit-btn">
+              Submit
+            </Button>
+          )}
         </Group>
       </form>
     </Container>
@@ -114,6 +152,9 @@ function RegistrationForm({ clubName }) {
   );
 }
 RegistrationForm.propTypes = {
+  clubName: PropTypes.string.isRequired,
+};
+ClubRegistrationForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
 

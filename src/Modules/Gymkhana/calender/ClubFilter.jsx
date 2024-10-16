@@ -1,4 +1,5 @@
 import { Select } from "@mantine/core";
+import PropTypes from "prop-types";
 
 function ClubFilter({ selectedClub, setSelectedClub }) {
   return (
@@ -7,7 +8,7 @@ function ClubFilter({ selectedClub, setSelectedClub }) {
       onChange={setSelectedClub}
       data={[
         { value: "All Clubs", label: "All Clubs" },
-        { value: "TPC", label: "TPC" },
+        { value: "BitByte", label: "TPC" },
         { value: "AFC", label: "AFC" },
         { value: "BMC", label: "BMC" },
         { value: "E-Cell", label: "E-Cell" },
@@ -21,5 +22,9 @@ function ClubFilter({ selectedClub, setSelectedClub }) {
     />
   );
 }
+ClubFilter.propTypes = {
+  selectedClub: PropTypes.string,
+  setSelectedClub: PropTypes.string,
+};
 
 export default ClubFilter;

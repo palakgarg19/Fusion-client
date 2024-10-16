@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, Suspense, lazy, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   Box,
@@ -17,148 +17,38 @@ import EventCalendar from "./calender/EventCalender";
 import EventCard from "./calender/EventCard";
 import CustomTable from "./CustomTable";
 import { festColumns, festData } from "./makeData";
+import {
+  useGetClubMembers,
+  useGetData,
+  useGetPastEvents,
+  useGetUpcomingEvents,
+  useGetClubAcheivement,
+} from "./BackendLogic/ApiRoutes";
 
 const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
-const events = [
-  {
-    date: dayjs("2024-10-05"),
-    name: "AFC Event 1",
-    time: "10:00 AM",
-    details: "Details about AFC Event 1",
-    color: "#81c784",
-    club: "AFC",
-  }, // Darker Green
-  {
-    date: dayjs("2024-11-08"),
-    name: "AFC Event 2",
-    time: "1:00 PM",
-    details: "Details about AFC Event 2",
-    color: "#81c784",
-    club: "AFC",
-  },
-  {
-    date: dayjs("2024-10-11"),
-    name: "AFC Event 3",
-    time: "3:00 PM",
-    details: "Details about AFC Event 3",
-    color: "#81c784",
-    club: "AFC",
-  },
-  {
-    date: dayjs("2024-11-22"),
-    name: "AFC Event 4",
-    time: "5:00 PM",
-    details: "Details about AFC Event 4",
-    color: "#81c784",
-    club: "AFC",
-  },
 
-  {
-    date: dayjs("2024-10-08"),
-    name: "TPC Event 1",
-    time: "2:00 PM",
-    details: "Details about TPC Event 1",
-    color: "#64b5f6",
-    club: "TPC",
-  }, // Darker Blue
-  {
-    date: dayjs("2024-12-05"),
-    name: "TPC Event 2",
-    time: "11:00 AM",
-    details: "Details about TPC Event 2",
-    color: "#64b5f6",
-    club: "TPC",
-  },
-  {
-    date: dayjs("2024-10-13"),
-    name: "TPC Event 3",
-    time: "4:30 PM",
-    details: "Details about TPC Event 3",
-    color: "#64b5f6",
-    club: "TPC",
-  },
-  {
-    date: dayjs("2024-11-24"),
-    name: "TPC Event 4",
-    time: "9:00 AM",
-    details: "Details about TPC Event 4",
-    color: "#64b5f6",
-    club: "TPC",
-  },
-
-  {
-    date: dayjs("2024-10-18"),
-    name: "BMC Event 1",
-    time: "10:30 AM",
-    details: "Details about BMC Event 1",
-    color: "#ef5350",
-    club: "BMC",
-  }, // Darker Red
-  {
-    date: dayjs("2024-11-09"),
-    name: "BMC Event 2",
-    time: "12:30 PM",
-    details: "Details about BMC Event 2",
-    color: "#ef5350",
-    club: "BMC",
-  },
-  {
-    date: dayjs("2024-11-04"),
-    name: "BMC Event 3",
-    time: "1:00 PM",
-    details: "Details about BMC Event 3",
-    color: "#ef5350",
-    club: "BMC",
-  },
-  {
-    date: dayjs("2024-12-05"),
-    name: "BMC Event 4",
-    time: "3:00 PM",
-    details: "Details about BMC Event 4",
-    color: "#ef5350",
-    club: "BMC",
-  },
-
-  {
-    date: dayjs("2024-10-28"),
-    name: "E-Cell Event 1",
-    time: "4:00 PM",
-    details: "Details about E-Cell Event 1",
-    color: "#ba68c8",
-    club: "E-Cell",
-  }, // Darker Purple
-  {
-    date: dayjs("2024-10-30"),
-    name: "E-Cell Event 2",
-    time: "1:30 PM",
-    details: "Details about E-Cell Event 2",
-    color: "#ba68c8",
-    club: "E-Cell",
-  },
-  {
-    date: dayjs("2024-11-02"),
-    name: "E-Cell Event 3",
-    time: "2:00 PM",
-    details: "Details about E-Cell Event 3",
-    color: "#ba68c8",
-    club: "E-Cell",
-  },
-  {
-    date: dayjs("2024-11-16"),
-    name: "E-Cell Event 4",
-    time: "6:00 PM",
-    details: "Details about E-Cell Event 4",
-    color: "#ba68c8",
-    club: "E-Cell",
-  },
-];
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
-  console.log("user", user);
   const [activeTab, setActiveTab] = useState("Clubs");
   const [value, setValue] = useState("Select a Club");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedClub, setSelectedClub] = useState("All Clubs");
+  const { data: upcomingEvents } = useGetUpcomingEvents();
+  const { data: pastEvents } = useGetPastEvents();
+  const { data: clubMembers, refetch: refetchClubMembers } =
+    useGetClubMembers(value);
+  const { data: clubDetail, refetch: refetchClubDetail } = useGetData(value);
+  const { data: Acheivements, refetch: refetchAcheivements } =
+    useGetClubAcheivement(value);
+  // Use useEffect to refetch data when `value` (selected club) changes
+  useEffect(() => {
+    if (value && value !== "Select a Club") {
+      refetchClubMembers(); // Trigger refetch of club members
+      refetchClubDetail();
+      refetchAcheivements(); // Trigger refetch of club details
+    }
+  }, [value, refetchClubMembers, refetchClubDetail]);
+
   return (
     <>
       <div>
@@ -175,7 +65,7 @@ function GymkhanaDashboard() {
         <Tabs.Panel value="Clubs" h="100vh">
           <Group justify="end" mt="5px">
             <Select
-              data={["TPC", "AFC"]}
+              data={["BitByte", "AFC"]}
               value={value}
               placeholder="Select a Club"
               onChange={setValue}
@@ -245,75 +135,87 @@ function GymkhanaDashboard() {
             ) : (
               <Suspense fallback={<div>Loading .......</div>}>
                 <ClubViewComponent
-                  AboutClub={`${value} is the club we are talking about `}
+                  // AboutClub={clubDetail.description} //TODO: not giving the .descriptioin check backend once
                   clubName={value}
-                  membersData={[
-                    {
-                      name: "John Doe",
-                      role: "Coordinator",
-                      rollNo: "22BCS178",
-                    },
-                    {
-                      name: "Jane Smith",
-                      role: "Co-Coordinator",
-                      rollNo: "23BDS002",
-                    },
-                    {
-                      name: "Emily Johnson",
-                      role: "Core Member",
-                      rollNo: "22BCS179",
-                    },
-                    {
-                      name: "Michael Brown",
-                      role: "Core Member",
-                      rollNo: "22BCS180",
-                    },
-                    { name: "Sarah Davis", role: "Member", rollNo: "23BDS003" },
-                    {
-                      name: "David Wilson",
-                      role: "Member",
-                      rollNo: "23BDS004",
-                    },
-                    {
-                      name: "Laura Martinez",
-                      role: "Core Member",
-                      rollNo: "22BCS181",
-                    },
-                    {
-                      name: "James Garcia",
-                      role: "Member",
-                      rollNo: "23BDS005",
-                    },
-                    {
-                      name: "Patricia Rodriguez",
-                      role: "Core Member",
-                      rollNo: "22BCS182",
-                    },
-                    { name: "Daniel Hall", role: "Member", rollNo: "23BDS006" },
-
-                    // add more members here
-                  ]}
-                  achievementsData={[
-                    { title: "First Place at Hackathon", year: "2022" },
-                    { title: "Best Club Award", year: "2023" },
-                    // add more achievements here
-                  ]}
-                  eventsData={[
-                    { name: "Coding Bootcamp", date: "2024-01-15" },
-                    { name: "Tech Fest", date: "2024-03-10" },
-                    // add more events here
-                  ]}
+                  membersData={clubMembers}
+                  achievementsData={Acheivements}
+                  eventsData={upcomingEvents.filter((item) => {
+                    if (item.club === value) return true;
+                    return false;
+                  })}
                   membersColumns={[
-                    { accessorKey: "name", header: "Name" },
-                    { accessorKey: "role", header: "Role" },
+                    {
+                      accessorKey: "club", // Key in your data object
+                      header: "Club", // Column header name
+                    },
+                    {
+                      accessorKey: "description",
+                      header: "Description",
+                    },
+
+                    {
+                      accessorKey: "member",
+                      header: "Member",
+                    },
+                    {
+                      accessorKey: "remarks",
+                      header: "Remarks",
+                    },
+                    {
+                      accessorKey: "status",
+                      header: "Status",
+                    },
                   ]}
                   achievementsColumns={[
                     { accessorKey: "title", header: "Title" },
-                    { accessorKey: "year", header: "Year" },
+                    { accessorKey: "achievement", header: "Acheivement" },
                   ]}
                   eventsColumns={[
-                    { accessorKey: "name", header: "Event Name" },
-                    { accessorKey: "date", header: "Date" },
+                    {
+                      accessorKey: "id",
+                      header: "ID",
+                    },
+                    {
+                      accessorKey: "club",
+                      header: "Club",
+                    },
+                    {
+                      accessorKey: "event_name",
+                      header: "Event Name",
+                    },
+                    {
+                      accessorKey: "incharge",
+                      header: "Incharge",
+                    },
+                    {
+                      accessorKey: "venue",
+                      header: "Venue",
+                    },
+                    {
+                      accessorKey: "start_date",
+                      header: "Start Date",
+                      render: (data) =>
+                        new Date(data.start_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "end_date",
+                      header: "End Date",
+                      render: (data) =>
+                        new Date(data.end_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "start_time",
+                      header: "Start Time",
+                      render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
+                    },
+                    {
+                      accessorKey: "status",
+                      header: "Status",
+                    },
+                    {
+                      accessorKey: "details",
+                      header: "Details",
+                    },
                   ]}
                 />
               </Suspense>
@@ -322,70 +224,73 @@ function GymkhanaDashboard() {
         </Tabs.Panel>
 
         <Tabs.Panel value="Calender" h="100vh">
-          <Container
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              height: "100%",
-              justifyContent: "center",
-              gap: "10px",
-            }}
-          >
-            {/* Left Section */}
+          {pastEvents && upcomingEvents && (
             <Container
               style={{
-                // Adjust this to ensure it occupies only 1/3 of the width
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: "50px",
-                paddingTop: "35px",
-                boxSizing: "border-box", // Ensures padding doesn’t add extra width
-                // overflow: "hidden",
+                flexDirection: "row",
+                height: "100%",
+                justifyContent: "center",
+                gap: "10px",
               }}
             >
-              <DateSelector
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-              />
-              <EventCard
-                events={events.filter((event) =>
-                  dayjs(event.date).isSame(selectedDate, "day"),
-                )}
-              />
-            </Container>
-
-            {/* Right Section */}
-            <Container
-              style={{
-                // Takes up the remaining space
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                boxSizing: "border-box",
-              }}
-            >
-              <div
+              {/* Left Section */}
+              <Container
                 style={{
+                  // Adjust this to ensure it occupies only 1/3 of the width
                   display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  alignItems: "center",
-                  overflow: "auto", // Ensures no overflow from the calendar header
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: "50px",
+                  paddingTop: "35px",
+                  boxSizing: "border-box", // Ensures padding doesn’t add extra width
+                  // overflow: "hidden",
                 }}
               >
-                <h2>{dayjs(selectedDate).format("MMMM YYYY")}</h2>
-                <ClubFilter
-                  selectedClub={selectedClub}
-                  setSelectedClub={setSelectedClub}
+                <DateSelector
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
                 />
-              </div>
-              <EventCalendar
-                selectedDate={selectedDate}
-                selectedClub={selectedClub}
-              />
+                <EventCard
+                  events={[...pastEvents, ...upcomingEvents].filter((event) =>
+                    dayjs(event.start_date).isSame(selectedDate, "day"),
+                  )}
+                />
+              </Container>
+
+              {/* Right Section */}
+              <Container
+                style={{
+                  // Takes up the remaining space
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  boxSizing: "border-box",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    alignItems: "center",
+                    overflow: "auto", // Ensures no overflow from the calendar header
+                  }}
+                >
+                  <h2>{dayjs(selectedDate).format("MMMM YYYY")}</h2>
+                  <ClubFilter
+                    selectedClub={selectedClub}
+                    setSelectedClub={setSelectedClub}
+                  />
+                </div>
+                <EventCalendar
+                  selectedDate={selectedDate}
+                  selectedClub={selectedClub}
+                  events={[...pastEvents, ...upcomingEvents]}
+                />
+              </Container>
             </Container>
-          </Container>
+          )}
         </Tabs.Panel>
 
         <Tabs.Panel value="Fests" h="100vh">
@@ -398,11 +303,116 @@ function GymkhanaDashboard() {
         </Tabs.Panel>
 
         <Tabs.Panel value="Events" h="100vh">
-          <Container mt="10px" mx="0" my="xs">
-            <Suspense fallback={<div>Loading Fests Table...</div>}>
-              <CustomTable data={festData} columns={festColumns} />
+          <Box mt="10px">
+            <Suspense fallback={<div>Loading Events Table for you ...</div>}>
+              {upcomingEvents && (
+                <CustomTable
+                  data={upcomingEvents}
+                  columns={[
+                    {
+                      accessorKey: "id",
+                      header: "ID",
+                    },
+                    {
+                      accessorKey: "club",
+                      header: "Club",
+                    },
+                    {
+                      accessorKey: "event_name",
+                      header: "Event Name",
+                    },
+                    {
+                      accessorKey: "incharge",
+                      header: "Incharge",
+                    },
+                    {
+                      accessorKey: "venue",
+                      header: "Venue",
+                    },
+                    {
+                      accessorKey: "start_date",
+                      header: "Start Date",
+                      render: (data) =>
+                        new Date(data.start_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "end_date",
+                      header: "End Date",
+                      render: (data) =>
+                        new Date(data.end_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "start_time",
+                      header: "Start Time",
+                      render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
+                    },
+                    {
+                      accessorKey: "status",
+                      header: "Status",
+                    },
+                    {
+                      accessorKey: "details",
+                      header: "Details",
+                    },
+                  ]}
+                  TableName="Upcoming Events"
+                />
+              )}
+              {pastEvents && (
+                <CustomTable
+                  data={pastEvents}
+                  columns={[
+                    {
+                      accessorKey: "id",
+                      header: "ID",
+                    },
+                    {
+                      accessorKey: "club",
+                      header: "Club",
+                    },
+                    {
+                      accessorKey: "event_name",
+                      header: "Event Name",
+                    },
+                    {
+                      accessorKey: "incharge",
+                      header: "Incharge",
+                    },
+                    {
+                      accessorKey: "venue",
+                      header: "Venue",
+                    },
+                    {
+                      accessorKey: "start_date",
+                      header: "Start Date",
+                      render: (data) =>
+                        new Date(data.start_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "end_date",
+                      header: "End Date",
+                      render: (data) =>
+                        new Date(data.end_date).toLocaleDateString(), // optional formatting
+                    },
+                    {
+                      accessorKey: "start_time",
+                      header: "Start Time",
+                      render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
+                    },
+                    {
+                      accessorKey: "status",
+                      header: "Status",
+                    },
+                    {
+                      accessorKey: "details",
+                      header: "Details",
+                    },
+                  ]}
+                  TableName="Past Events"
+                />
+              )}
             </Suspense>
-          </Container>
+          </Box>
           {/* need to make a Table with previous Events in Campus */}
         </Tabs.Panel>
       </Tabs>

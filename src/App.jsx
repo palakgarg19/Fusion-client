@@ -10,6 +10,7 @@ import ForgotPassword from "./pages/forgotPassword";
 import AcademicPage from "./Modules/Academic/index";
 import ValidateAuth from "./helper/validateauth";
 import GymkhanaDashboard from "./Modules/Gymkhana/GymkhanaDashboard.jsx";
+import Test from "./Modules/Gymkhana/Test.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -59,6 +60,7 @@ export default function App() {
             </Layout>
           }
         />
+        <Route path="/Test" element={<Test />} />
       </Routes>
     </MantineProvider>
   );
