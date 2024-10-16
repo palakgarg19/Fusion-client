@@ -1,4 +1,4 @@
-import { Container, Group, Stack, Tabs, Text } from "@mantine/core";
+import { Box, Container, Group, Stack, Tabs, Text } from "@mantine/core";
 import { useState, lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
@@ -6,6 +6,7 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "mantine-react-table/styles.css";
 import EventApprovalsWithProviders from "./ApprovalsTable";
+import CoordinatorMembersWithProviders from "./CoordinatorMembersTable";
 
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
 const CustomTable = lazy(() => import("./CustomTable"));
@@ -27,24 +28,7 @@ function ClubViewComponent({
   const renderActiveContent = () => {
     switch (activeclubfeature) {
       case "About":
-        return (
-          <Text>
-            This is the about section for the {clubName} club.Lorem ipsum is a
-            placeholder text commonly used in design, typesetting, and web
-            development to demonstrate the visual form of a document or a
-            typeface without relying on meaningful content. The text is derived
-            from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et
-            Malorum," a 45 BC work by Cicero, and is often used because it
-            approximates the distribution of letters in English, providing a
-            natural look to layouts. The standard "Lorem ipsum" text has been
-            used in the printing industry since the 1500s when an unknown
-            printer scrambled parts of Cicero's text to create a type specimen
-            book. Since then, it has become the industry's default placeholder
-            text, maintaining its popularity through centuries of evolving
-            design and printing technology.
-            {AboutClub}
-          </Text>
-        );
+        return <Text>{AboutClub}</Text>;
       case "Members":
         return (
           <Suspense fallback={<div>Loading Members Table</div>}>
@@ -67,25 +51,25 @@ function ClubViewComponent({
       case "Events":
         return (
           <Suspense fallback={<div>Loading Events Table.....</div>}>
-            <CustomTable columns={eventsColumns} data={eventsData} />;
+            <CustomTable columns={eventsColumns} data={eventsData} />
           </Suspense>
         );
       case "EventsApproval":
         return (
           <Suspense fallback={<div>Loading Table component</div>}>
-            <EventApprovalsWithProviders />
+            <EventApprovalsWithProviders clubName={clubName} />
           </Suspense>
         );
       case "BudgetApproval":
         return (
           <Suspense fallback={<div>Loading Table component</div>}>
-            <EventApprovalsWithProviders />
+            <EventApprovalsWithProviders clubName={clubName} />
           </Suspense>
         );
       case "Members_co-ordinator":
         return (
           <Suspense fallback={<div>Loading Members Table</div>}>
-            <CustomTable data={membersData} columns={membersColumns} />
+            <CoordinatorMembersWithProviders clubName={clubName} />
             {/* need to make query prop wghich would filter the data if required  */}
           </Suspense>
         );
@@ -120,7 +104,7 @@ function ClubViewComponent({
   };
 
   return (
-    <Container style={{ height: "100vh", width: "100vw" }}>
+    <Box style={{ height: "100vh" }}>
       {" "}
       {/* Ensures it spans the full viewport height */}
       <Group justify="space-between">
@@ -149,7 +133,7 @@ function ClubViewComponent({
               )}
               {user.role === "co-ordinator" && (
                 <>
-                  <Tabs.Tab value="EventsApproval">EventsAPproval</Tabs.Tab>
+                  <Tabs.Tab value="EventsApproval">EventsApproval</Tabs.Tab>
                   <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
                   <Tabs.Tab value="EventsApprovalForm">
                     Events approval Form
@@ -167,7 +151,7 @@ function ClubViewComponent({
       <Container h="80vh" mt="20px">
         {renderActiveContent()}
       </Container>
-    </Container>
+    </Box>
   );
 }
 

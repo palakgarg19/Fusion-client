@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Paper, Text } from "@mantine/core";
+import PropTypes from "prop-types";
 
 function EventCard({ events }) {
   if (!events || events.length === 0) {
@@ -15,8 +16,8 @@ function EventCard({ events }) {
               {event.name}
             </Text>
             <Text>Club: {event.club}</Text>
-            <Text>Time: {event.time}</Text>
-            {/* <Text>Date: {event.date}</Text> */}
+            <Text>Time: {event.start_time}</Text>
+            <Text>Date: {event.start_date}</Text>
             <Text>Description: {event.details}</Text>
           </Card>
         </Paper>
@@ -24,5 +25,14 @@ function EventCard({ events }) {
     </div>
   );
 }
-
+EventCard.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      start_time: PropTypes.string,
+      end_time: PropTypes.string,
+      start_date: PropTypes.string,
+      end_date: PropTypes.string,
+    }),
+  ),
+};
 export default EventCard;

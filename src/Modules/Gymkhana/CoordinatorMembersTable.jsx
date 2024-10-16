@@ -3,29 +3,36 @@ import "@mantine/dates/styles.css"; // if using mantine date picker features
 import "mantine-react-table/styles.css"; // make sure MRT styles were imported in your app root (once)
 import { useMemo, useState } from "react";
 import { MantineReactTable, useMantineReactTable } from "mantine-react-table";
-import { ActionIcon, Flex, Stack, Text, Tooltip, Modal } from "@mantine/core";
-import { ModalsProvider, modals } from "@mantine/modals";
+import { ActionIcon, Flex, Tooltip } from "@mantine/core";
 import { IconEye, IconTrash } from "@tabler/icons-react";
 import PropTypes from "prop-types";
 import { useGetClubMembers } from "./BackendLogic/ApiRoutes";
 
-function EventApprovals({ clubName }) {
-  const [selectedEvent, setSelectedEvent] = useState(null);
+function CoordinatorMembers({ clubName }) {
   const [validationErrors, setValidationErrors] = useState({});
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "Status",
+        accessorKey: "club", // Key in your data object
+        header: "Club", // Column header name
+      },
+      {
+        accessorKey: "description",
+        header: "Description",
+      },
+
+      {
+        accessorKey: "member",
+        header: "Member",
+      },
+      {
+        accessorKey: "remarks",
+        header: "Remarks",
+      },
+      {
+        accessorKey: "status",
         header: "Status",
-      },
-      {
-        accessorKey: "Event Title",
-        header: "Event Title",
-      },
-      {
-        accessorKey: "Date",
-        header: "Date",
       },
     ],
     [validationErrors],
@@ -37,15 +44,7 @@ function EventApprovals({ clubName }) {
     isFetching: isFetchingEvents,
     isLoading: isLoadingEvents,
   } = useGetClubMembers(clubName);
-
-  const openViewModal = (event) => {
-    setSelectedEvent(event);
-  };
-
-  const closeViewModal = () => {
-    setSelectedEvent(null);
-  };
-
+  console.log(fetchedEvents, clubName);
   const table = useMantineReactTable({
     columns,
     data: fetchedEvents,
@@ -59,11 +58,6 @@ function EventApprovals({ clubName }) {
       : undefined,
     renderRowActions: ({ row }) => (
       <Flex gap="md">
-        <Tooltip label="View">
-          <ActionIcon onClick={() => openViewModal(row.original)}>
-            <IconEye />
-          </ActionIcon>
-        </Tooltip>
         <Tooltip label="Delete">
           <ActionIcon
             color="red"
@@ -83,33 +77,17 @@ function EventApprovals({ clubName }) {
     },
   });
 
-  return (
-    <>
-      <MantineReactTable table={table} />
-      <Modal
-        opened={!!selectedEvent}
-        onClose={closeViewModal}
-        title="Event Details"
-      >
-        {/* View Content  */}
-        {selectedEvent && (
-          <Stack>
-            <Text>Need put view content</Text>
-          </Stack>
-        )}
-      </Modal>
-    </>
-  );
+  return <MantineReactTable table={table} />;
 }
 
-function EventApprovalsWithProviders({ clubName }) {
-  return <EventApprovals clubName={clubName} />;
+function CoordinatorMembersWithProviders({ clubName }) {
+  return <CoordinatorMembers clubName={clubName} />;
 }
-EventApprovalsWithProviders.propTypes = {
+CoordinatorMembersWithProviders.propTypes = {
   clubName: PropTypes.string,
 };
-EventApprovals.propTypes = {
+CoordinatorMembers.propTypes = {
   clubName: PropTypes.string,
 };
 
-export default EventApprovalsWithProviders;
+export default CoordinatorMembersWithProviders;

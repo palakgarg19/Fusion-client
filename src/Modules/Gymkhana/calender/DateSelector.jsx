@@ -1,5 +1,6 @@
 import { DatePicker } from "@mantine/dates";
 import { Container } from "@mantine/core";
+import PropTypes from "prop-types";
 
 function DateSelector({ selectedDate, setSelectedDate }) {
   return (
@@ -12,5 +13,10 @@ function DateSelector({ selectedDate, setSelectedDate }) {
     </Container>
   );
 }
+
+DateSelector.propTypes = {
+  selectedDate: PropTypes.string,
+  setSelectedDate: PropTypes.string,
+};
 
 export default DateSelector;
