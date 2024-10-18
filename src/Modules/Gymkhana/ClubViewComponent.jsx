@@ -23,12 +23,13 @@ function ClubViewComponent({
   eventsColumns,
 }) {
   const user = useSelector((state) => state.user);
+  const userRole = user.role;
   const [activeclubfeature, setactiveclubfeature] = useState("About");
 
   const renderActiveContent = () => {
     switch (activeclubfeature) {
       case "About":
-        return <Text>{AboutClub}</Text>;
+        return <Text>Lorem Text over here from DB </Text>;
       case "Members":
         return (
           <Suspense fallback={<div>Loading Members Table</div>}>
@@ -45,13 +46,18 @@ function ClubViewComponent({
             <CustomTable
               columns={achievementsColumns}
               data={achievementsData}
+              TableName="Acheievements"
             />
           </Suspense>
         );
       case "Events":
         return (
           <Suspense fallback={<div>Loading Events Table.....</div>}>
-            <CustomTable columns={eventsColumns} data={eventsData} />
+            <CustomTable
+              columns={eventsColumns}
+              data={eventsData}
+              TableName="Events"
+            />
           </Suspense>
         );
       case "EventsApproval":
@@ -131,6 +137,21 @@ function ClubViewComponent({
               {user.role !== "co-ordinator" && (
                 <Tabs.Tab value="Register">Register</Tabs.Tab>
               )}
+              {(userRole === "FIC" ||
+                userRole === "Dean" ||
+                userRole === "Counsellor" ||
+                userRole === "Professor") && (
+                <>
+                  <Tabs.Tab value="EventsApproval">EventsApproval</Tabs.Tab>
+                  <Tabs.Tab value="BudgetApproval"> Budget Approval</Tabs.Tab>
+                  <Tabs.Tab value="EventsApprovalForm">
+                    Events approval Form
+                  </Tabs.Tab>
+                  <Tabs.Tab value="BudgetApprovalForm">
+                    Budget approval Form
+                  </Tabs.Tab>
+                </>
+              )}
               {user.role === "co-ordinator" && (
                 <>
                   <Tabs.Tab value="EventsApproval">EventsApproval</Tabs.Tab>
@@ -148,9 +169,9 @@ function ClubViewComponent({
         </Group>
       </Group>
       {/* Render the active content based on the active tab */}
-      <Container h="80vh" mt="20px">
+      <Box h="80vh" mt="20px">
         {renderActiveContent()}
-      </Container>
+      </Box>
     </Box>
   );
 }

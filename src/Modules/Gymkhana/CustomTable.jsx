@@ -99,7 +99,6 @@ function CustomTable({ data, columns, TableName }) {
   const table = useMantineReactTable({
     columns,
     data,
-    enableRowSelection: true,
     initialState: {
       pagination: { pageSize: 5, pageIndex: 0 },
       showGlobalFilter: true,
@@ -109,7 +108,9 @@ function CustomTable({ data, columns, TableName }) {
       rowsPerPageOptions: ["5", "10", "15"],
     },
     paginationDisplayMode: "pages",
-    size: 10,
+    mantineTableBodyCellProps: {
+      width: "20px",
+    },
     enableStickyHeader: true,
   });
 
@@ -140,7 +141,8 @@ function CustomTable({ data, columns, TableName }) {
               <Table.Tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <Table.Th
-                    key={header.id} // Minimum width for each header
+                    key={header.id}
+                    // Minimum width for each header
                   >
                     {header.isPlaceholder
                       ? null

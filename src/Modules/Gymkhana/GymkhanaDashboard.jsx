@@ -33,7 +33,8 @@ function GymkhanaDashboard() {
   const [value, setValue] = useState("Select a Club");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedClub, setSelectedClub] = useState("All Clubs");
-  const { data: upcomingEvents } = useGetUpcomingEvents();
+  const { data: upcomingEvents, isLoading: loadingUpcomingEvents } =
+    useGetUpcomingEvents();
   const { data: pastEvents } = useGetPastEvents();
   const { data: clubMembers, refetch: refetchClubMembers } =
     useGetClubMembers(value);
@@ -72,7 +73,7 @@ function GymkhanaDashboard() {
               w="220px"
             />
           </Group>
-          <Box mt="30px" mx="30px" px="30px" mb="xs" w="78vw">
+          <Box mt="30px" mx="30px" px="30px" mb="xs" w="90vw">
             {value === "Select a Club" ? (
               <Paper shadow="md" p="xl" h="80vh" w="80vw" ml="20px">
                 <Container>
@@ -134,90 +135,86 @@ function GymkhanaDashboard() {
               </Paper>
             ) : (
               <Suspense fallback={<div>Loading .......</div>}>
-                <ClubViewComponent
-                  // AboutClub={clubDetail.description} //TODO: not giving the .descriptioin check backend once
-                  clubName={value}
-                  membersData={clubMembers}
-                  achievementsData={Acheivements}
-                  eventsData={upcomingEvents.filter((item) => {
-                    if (item.club === value) return true;
-                    return false;
-                  })}
-                  membersColumns={[
-                    {
-                      accessorKey: "club", // Key in your data object
-                      header: "Club", // Column header name
-                    },
-                    {
-                      accessorKey: "description",
-                      header: "Description",
-                    },
+                {upcomingEvents && Acheivements && clubMembers && (
+                  <ClubViewComponent
+                    // AboutClub={clubDetail.description} //TODO: not giving the .descriptioin check backend once
+                    clubName={value}
+                    membersData={clubMembers}
+                    achievementsData={Acheivements}
+                    eventsData={upcomingEvents.filter((item) => {
+                      if (item.club === value && item.status === "ACCEPT")
+                        return true;
+                      return false;
+                    })}
+                    membersColumns={[
+                      {
+                        accessorKey: "club", // Key in your data object
+                        header: "Club", // Column header name
+                      },
+                      {
+                        accessorKey: "description",
+                        header: "Description",
+                      },
 
-                    {
-                      accessorKey: "member",
-                      header: "Member",
-                    },
-                    {
-                      accessorKey: "remarks",
-                      header: "Remarks",
-                    },
-                    {
-                      accessorKey: "status",
-                      header: "Status",
-                    },
-                  ]}
-                  achievementsColumns={[
-                    { accessorKey: "title", header: "Title" },
-                    { accessorKey: "achievement", header: "Acheivement" },
-                  ]}
-                  eventsColumns={[
-                    {
-                      accessorKey: "id",
-                      header: "ID",
-                    },
-                    {
-                      accessorKey: "club",
-                      header: "Club",
-                    },
-                    {
-                      accessorKey: "event_name",
-                      header: "Event Name",
-                    },
-                    {
-                      accessorKey: "incharge",
-                      header: "Incharge",
-                    },
-                    {
-                      accessorKey: "venue",
-                      header: "Venue",
-                    },
-                    {
-                      accessorKey: "start_date",
-                      header: "Start Date",
-                      render: (data) =>
-                        new Date(data.start_date).toLocaleDateString(), // optional formatting
-                    },
-                    {
-                      accessorKey: "end_date",
-                      header: "End Date",
-                      render: (data) =>
-                        new Date(data.end_date).toLocaleDateString(), // optional formatting
-                    },
-                    {
-                      accessorKey: "start_time",
-                      header: "Start Time",
-                      render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
-                    },
-                    {
-                      accessorKey: "status",
-                      header: "Status",
-                    },
-                    {
-                      accessorKey: "details",
-                      header: "Details",
-                    },
-                  ]}
-                />
+                      {
+                        accessorKey: "member",
+                        header: "Member",
+                      },
+                      {
+                        accessorKey: "remarks",
+                        header: "Remarks",
+                      },
+                      {
+                        accessorKey: "status",
+                        header: "Status",
+                      },
+                    ]}
+                    achievementsColumns={[
+                      { accessorKey: "title", header: "Title" },
+                      { accessorKey: "achievement", header: "Acheivement" },
+                    ]}
+                    eventsColumns={[
+                      {
+                        accessorKey: "club",
+                        header: "Club",
+                      },
+                      {
+                        accessorKey: "event_name",
+                        header: "Event Name",
+                      },
+                      {
+                        accessorKey: "incharge",
+                        header: "Incharge",
+                      },
+                      {
+                        accessorKey: "venue",
+                        header: "Venue",
+                      },
+                      {
+                        accessorKey: "start_date",
+                        header: "Start Date",
+                        render: (data) =>
+                          new Date(data.start_date).toLocaleDateString(), // optional formatting
+                      },
+                      {
+                        accessorKey: "end_date",
+                        header: "End Date",
+                        render: (data) =>
+                          new Date(data.end_date).toLocaleDateString(), // optional formatting
+                      },
+                      {
+                        accessorKey: "start_time",
+                        header: "Start Time",
+                        render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
+                      },
+
+                      {
+                        accessorKey: "details",
+                        header: "Details",
+                      },
+                    ]}
+                  />
+                )}
               </Suspense>
             )}
           </Box>
@@ -294,11 +291,15 @@ function GymkhanaDashboard() {
         </Tabs.Panel>
 
         <Tabs.Panel value="Fests" h="100vh">
-          <Container mt="10px" mx="0" my="xs">
+          <Box mt="10px" mx="0" my="xs">
             <Suspense fallback={<div>Loading Fests Table...</div>}>
-              <CustomTable data={festData} columns={festColumns} />
+              <CustomTable
+                data={festData}
+                columns={festColumns}
+                TableName="Fests"
+              />
             </Suspense>
-          </Container>
+          </Box>
           {/* need to make page where we have previous Fests listed here in Table */}
         </Tabs.Panel>
 

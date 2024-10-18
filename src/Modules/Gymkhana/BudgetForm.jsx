@@ -1,45 +1,120 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "@mantine/form";
-import { TextInput, Button, Group, Container, FileInput } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Alert,
+  FileInput,
+} from "@mantine/core";
 import PropTypes from "prop-types";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import "./GymkhanaForms.css";
 
-function BudgetApprovalForm() {
+const token = localStorage.getItem("authToken");
+
+function BudgetApprovalForm({ clubName }) {
+  console.log(clubName);
+
+  // State for success and error messages
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   // Set up the form with initial values and validation
   const form = useForm({
     initialValues: {
-      title: "",
+      budget_for: "",
       description: "",
-      pdf: null,
+      budget_file: null, // For the file upload
+      budget_amt: "",
+      status: "",
+      remarks: "",
+      club: clubName,
     },
-
     validate: {
-      title: (value) =>
-        value.length < 2 ? "Title must have at least 2 letters" : null,
+      budget_for: (value) =>
+        value.length === 0 ? "Budget for cannot be empty" : null,
       description: (value) =>
         value.length === 0 ? "Description cannot be empty" : null,
-      pdf: (value) => (!value ? "You must attach a PDF" : null),
+      budget_amt: (value) =>
+        typeof value !== "number" || Number.isNaN(value) || value <= 0
+          ? "Budget amount must be a positive number"
+          : null,
+      status: (value) => (value.length === 0 ? "Status cannot be empty" : null),
+      remarks: (value) =>
+        value.length === 0 ? "Remarks cannot be empty" : null,
+      budget_file: (value) => (!value ? "You must attach a PDF" : null), // File validation
+    },
+  });
+
+  // Mutation setup for submitting the form data via API
+  const mutation = useMutation({
+    mutationFn: (newBudgetData) => {
+      // Create a FormData object for file upload
+      const formData = new FormData();
+      formData.append("budget_for", newBudgetData.budget_for);
+      formData.append("description", newBudgetData.description);
+      formData.append("budget_amt", newBudgetData.budget_amt);
+      formData.append("status", newBudgetData.status);
+      formData.append("remarks", newBudgetData.remarks);
+      formData.append("club", newBudgetData.club);
+      formData.append("budget_file", newBudgetData.budget_file); // Attach the file
+
+      return axios.put(
+        "http://127.0.0.1:8000/gymkhana/api/new_budget/", // API URL for the budget submission
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // For file uploads
+            Authorization: `Token ${token}`, // Auth token
+          },
+        },
+      );
+    },
+    onSuccess: (response) => {
+      console.log("Successfully submitted budget:", response.data);
+      setSuccessMessage("Budget submission successful!");
+      form.reset(); // Optionally reset the form after successful submission
+    },
+    onError: (error) => {
+      console.error("Error during budget submission:", error);
+      setErrorMessage("Budget submission failed. Please try again.");
     },
   });
 
   // Submit handler
   const handleSubmit = (values) => {
-    console.log("Form submitted:", values);
-    // Add your submission logic here
+    mutation.mutate(values);
   };
 
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
-        {/* Title */}
+        {/* Success Message */}
+        {successMessage && (
+          <Alert title="Success" color="green" mt="md">
+            {successMessage}
+          </Alert>
+        )}
+
+        {/* Error Message */}
+        {errorMessage && (
+          <Alert title="Error" color="red" mt="md">
+            {errorMessage}
+          </Alert>
+        )}
+
+        {/* Budget For */}
         <TextInput
-          label="Title"
-          placeholder="Enter budget title"
-          value={form.values.title}
+          label="Budget For"
+          placeholder="What is this budget for?"
+          value={form.values.budget_for}
           onChange={(event) =>
-            form.setFieldValue("title", event.currentTarget.value)
+            form.setFieldValue("budget_for", event.currentTarget.value)
           }
-          error={form.errors.title}
+          error={form.errors.budget_for}
           withAsterisk
         />
 
@@ -55,22 +130,61 @@ function BudgetApprovalForm() {
           withAsterisk
         />
 
+        {/* Budget Amount */}
+        <TextInput
+          label="Budget Amount"
+          placeholder="Enter budget amount"
+          type="number" // Specify the input type as number
+          value={form.values.budget_amt}
+          onChange={(event) => {
+            const value = parseFloat(event.currentTarget.value); // Convert input to a number
+            form.setFieldValue("budget_amt", Number.isNaN(value) ? 0 : value); // Handle NaN
+          }}
+          error={form.errors.budget_amt}
+          withAsterisk
+        />
+
         {/* PDF Upload */}
         <FileInput
           label="Attach PDF"
           placeholder="Upload your budget PDF"
-          value={form.values.pdf}
-          onChange={(file) => form.setFieldValue("pdf", file)}
-          error={form.errors.pdf}
+          onChange={(file) => form.setFieldValue("budget_file", file)}
+          error={form.errors.budget_file}
           accept=".pdf"
+          withAsterisk
+        />
+
+        {/* Status */}
+        <TextInput
+          label="Status"
+          placeholder="Enter the status"
+          value={form.values.status}
+          onChange={(event) =>
+            form.setFieldValue("status", event.currentTarget.value)
+          }
+          error={form.errors.status}
+          withAsterisk
+        />
+
+        {/* Remarks */}
+        <TextInput
+          label="Remarks"
+          placeholder="Enter remarks"
+          value={form.values.remarks}
+          onChange={(event) =>
+            form.setFieldValue("remarks", event.currentTarget.value)
+          }
+          error={form.errors.remarks}
           withAsterisk
         />
 
         {/* Submit Button */}
         <Group position="center" mt="md">
-          <Button type="submit" className="submit-btn">
-            Submit
-          </Button>
+          {token && (
+            <Button type="submit" className="submit-btn">
+              Submit
+            </Button>
+          )}
         </Group>
       </form>
     </Container>
@@ -83,7 +197,7 @@ function BudgetForm({ clubName }) {
   return (
     <Container>
       <h2 className="club-header">Submit {clubName}'s Budget Proposal</h2>
-      <BudgetApprovalForm />
+      <BudgetApprovalForm clubName={clubName} />
     </Container>
   );
 }

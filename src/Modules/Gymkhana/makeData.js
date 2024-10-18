@@ -1,24 +1,24 @@
 export const festData = [
   {
-    name: "Cultural Fest",
+    name: "Tarang Fest",
     duration: "March 15 - March 17",
     domain: "Cultural",
-    year: "2022",
+    year: "2024",
   },
   {
-    name: "Tech Fest",
+    name: "HackByte 2.0",
     duration: "April 20 - April 22",
     domain: "Technical",
-    year: "2023",
+    year: "2024",
   },
   {
-    name: "Sports Meet",
+    name: "Gusto",
     duration: "February 10 - February 12",
     domain: "Sports",
     year: "2023",
   },
   {
-    name: "Music Carnival",
+    name: "Saaz",
     duration: "November 5 - November 7",
     domain: "Cultural",
     year: "2021",
