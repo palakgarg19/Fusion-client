@@ -1,18 +1,11 @@
 import React from "react";
-import { useForm, isEmail } from "@mantine/form";
-import {
-  TextInput,
-  Textarea,
-  Button,
-  Group,
-  Container,
-  Alert,
-} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { TextInput, Textarea, Button, Group, Container } from "@mantine/core";
 
 import "./GymkhanaForms.css";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { Mutation, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 const token = localStorage.getItem("authToken");
@@ -23,7 +16,6 @@ function ClubRegistrationForm({ clubName }) {
     initialValues: {
       name: user.username,
       rollNumber: null,
-      email: "",
       achievements: "",
       experience: "",
       club: clubName,
@@ -34,15 +26,22 @@ function ClubRegistrationForm({ clubName }) {
         value.length < 2 ? "First name must have at least 2 letters" : null,
       rollNumber: (value) =>
         value.length < 8 ? "Roll no must have at least 8 letters" : null,
-      email: (value) => (isEmail(value) ? null : "Invalid email format"),
     },
   });
   // TODO need to add logic for addition to DB
   const mutation = useMutation({
     mutationFn: (newMemberData) => {
+      console.log(newMemberData);
       return axios.post(
         "http://localhost:8000/gymkhana/api/club_membership/",
-        newMemberData,
+        {
+          member: newMemberData.rollNumber,
+          club: newMemberData.club,
+          description:
+            `Experience: ${newMemberData.experience}` +
+            `\n` +
+            `Acheivement: ${newMemberData.achievements}`,
+        },
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -57,12 +56,12 @@ function ClubRegistrationForm({ clubName }) {
       onSuccess: (response) => {
         // Handle success (you can redirect or show a success message)
         console.log("Successfully registered:", response.data);
-        Alert("Registration successful!");
+        alert("Registration successful!");
       },
       onError: (error) => {
         // Handle error (you can show an error message)
         console.error("Error during registration:", error);
-        Alert("Registration failed. Please try again.");
+        alert("Registration failed. Please try again.");
       },
     });
   };
@@ -91,18 +90,6 @@ function ClubRegistrationForm({ clubName }) {
             form.setFieldValue("rollNumber", event.currentTarget.value)
           }
           error={form.errors.rollNumber}
-          withAsterisk
-        />
-
-        {/* Email */}
-        <TextInput
-          label="Email"
-          placeholder="Enter your email"
-          value={form.values.email}
-          onChange={(event) =>
-            form.setFieldValue("email", event.currentTarget.value)
-          }
-          error={form.errors.email}
           withAsterisk
         />
 
