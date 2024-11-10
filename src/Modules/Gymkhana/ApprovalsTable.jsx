@@ -34,7 +34,9 @@ import {
   approveCounsellorEventButton,
   approveDeanEventButton,
 } from "./BackendLogic/ApiRoutes";
+
 import { EventsApprovalForm } from "./EventForm";
+
 
 function EventApprovals({ clubName }) {
   const user = useSelector((state) => state.user);
@@ -73,6 +75,7 @@ function EventApprovals({ clubName }) {
     isFetching: isFetchingEvents,
     isLoading: isLoadingEvents,
   } = useGetUpcomingEvents(token);
+
 
   const openViewModal = (event) => {
     setSelectedEvent(event);
@@ -128,6 +131,7 @@ function EventApprovals({ clubName }) {
     },
   });
 
+
   const handleCommentSubmit = (values) => {
     mutation.mutate(values, {
       onSuccess: (response) => {
@@ -141,6 +145,7 @@ function EventApprovals({ clubName }) {
     });
   };
 
+
   const approveFICMutation = useMutation({
     mutationFn: (eventId) => {
       approveFICEventButton(eventId, token);
@@ -151,13 +156,16 @@ function EventApprovals({ clubName }) {
     },
   });
 
+
   const approveCounsellorMutation = useMutation({
     mutationFn: (eventId) => approveCounsellorEventButton(eventId, token),
     onSuccess: () => {
+
       alert("Approved by Counsellor");
       closeViewModal();
     },
   });
+
 
   const approveDeanMutation = useMutation({
     mutationFn: (eventId) => approveDeanEventButton(eventId, token),
@@ -167,6 +175,7 @@ function EventApprovals({ clubName }) {
     },
   });
 
+
   const rejectMutation = useMutation({
     mutationFn: (eventId) => rejectEventButton(eventId, token),
     onSuccess: () => {
@@ -174,6 +183,7 @@ function EventApprovals({ clubName }) {
       closeViewModal();
     },
   });
+
 
   const modifyMutation = useMutation({
     mutationFn: (eventId) => modifyEventButton(eventId, token),
@@ -189,7 +199,6 @@ function EventApprovals({ clubName }) {
   const handleCounsellorApproveButton = (eventId) => {
     approveCounsellorMutation.mutate(eventId);
   };
-
   const handleDeanApproveButton = (eventId) => {
     approveDeanMutation.mutate(eventId);
   };
@@ -201,6 +210,7 @@ function EventApprovals({ clubName }) {
   const handleModifyButton = (eventId) => {
     modifyMutation.mutate(eventId);
   };
+
 
   const table = useMantineReactTable({
     columns,
@@ -263,10 +273,12 @@ function EventApprovals({ clubName }) {
         onClose={closeViewModal}
         w="40%"
       >
+
         {selectedEvent && (
           <Stack
             spacing="md"
             sx={{
+
               width: "100%",
               padding: "20px",
               border: "1px solid #dfe1e5",
@@ -315,6 +327,7 @@ function EventApprovals({ clubName }) {
                   <ScrollArea h={250}>
                     {commentsData?.map((comment) => (
                       <Box
+
                         key={comment.comment}
                         my="sm"
                         style={{
@@ -388,6 +401,7 @@ function EventApprovals({ clubName }) {
                         FIC Approve
                       </Button>
                     )}
+
                     {userRole === "Dean_s" && (
                       <Button
                         color="blue"
@@ -494,5 +508,6 @@ function EventApprovalsWithProviders({ clubName }) {
 EventApprovalsWithProviders.propTypes = {
   clubName: PropTypes.string,
 };
+
 
 export default EventApprovalsWithProviders;

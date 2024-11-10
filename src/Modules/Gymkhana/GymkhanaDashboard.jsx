@@ -35,6 +35,7 @@ function GymkhanaDashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedClub, setSelectedClub] = useState("All Clubs");
   const { data: upcomingEvents, isLoading: loadingUpcomingEvents } =
+
     useGetUpcomingEvents(token);
   const { data: pastEvents } = useGetPastEvents(token);
   const { data: clubMembers, refetch: refetchClubMembers } = useGetClubMembers(

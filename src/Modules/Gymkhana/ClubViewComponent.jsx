@@ -1,3 +1,4 @@
+
 import { Box, Group, Stack, Tabs, Text } from "@mantine/core";
 import { useState, lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
@@ -9,6 +10,7 @@ import EventApprovalsWithProviders from "./ApprovalsTable";
 import CoordinatorMembersWithProviders from "./CoordinatorMembersTable";
 import BudgetApprovalsWithProviders from "./BudgetApprovalTable";
 import { useGetCurrentLoginnedRoleRelatedClub } from "./BackendLogic/ApiRoutes";
+
 
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
 const CustomTable = lazy(() => import("./CustomTable"));
@@ -113,6 +115,7 @@ function ClubViewComponent({
         );
     }
   };
+
   console.log(CurrentLogginedRelatedClub, clubName, user);
   return (
     <Box style={{ height: "100vh" }}>

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+
 // club details from here can be inferred from here
 export const useGetData = (clubName, token) => {
   return useQuery({
@@ -26,6 +27,7 @@ export const useGetData = (clubName, token) => {
 };
 
 // upcoming global events
+
 export const useGetUpcomingEvents = (token) => {
   return useQuery({
     queryKey: ["UpcomingEventsData"],
@@ -51,6 +53,7 @@ export const useGetUpcomingEvents = (token) => {
 };
 
 // past global events
+
 export const useGetPastEvents = (token) => {
   return useQuery({
     queryKey: ["PastEventsData"],
@@ -74,6 +77,7 @@ export const useGetPastEvents = (token) => {
 };
 
 // get club Memebers , here we will get all data over here and then we need to filter
+
 export const useGetClubMembers = (clubName, token) => {
   return useQuery({
     queryKey: ["clubMemebersData"],
@@ -97,6 +101,7 @@ export const useGetClubMembers = (clubName, token) => {
     },
   });
 };
+
 
 export const useGetClubAcheivement = (clubName, token) => {
   return useQuery({
@@ -122,6 +127,7 @@ export const useGetClubAcheivement = (clubName, token) => {
   });
 };
 // TODO: implement the comment functionality
+
 export const useGetCommentsEventInfo = (EventId, token) => {
   console.log("EventId:", EventId);
   return useQuery({
@@ -148,7 +154,9 @@ export const useGetCommentsEventInfo = (EventId, token) => {
   });
 };
 // TODO handle Approve Button for Event form
+
 export const approveFICEventButton = async (eventId, token) => {
+
   const response = axios.put(
     "http://localhost:8000/gymkhana/api/fic_approve_event/",
     { id: eventId },
@@ -160,6 +168,7 @@ export const approveFICEventButton = async (eventId, token) => {
   );
   return (await response).data;
 };
+
 export const approveCounsellorEventButton = async (eventId, token) => {
   return axios.put(
     "http://localhost:8000/gymkhana/api/counsellor_approve_event/",
@@ -171,6 +180,7 @@ export const approveCounsellorEventButton = async (eventId, token) => {
     },
   );
 };
+
 
 export const approveDeanEventButton = async (eventId, token) => {
   return axios.put(
@@ -185,6 +195,7 @@ export const approveDeanEventButton = async (eventId, token) => {
 };
 
 // API call for rejecting
+
 export const rejectEventButton = async (eventId, token) => {
   return axios.put(
     "http://localhost:8000/gymkhana/api/reject_event/",
@@ -347,3 +358,4 @@ export const useGetCurrentLoginnedRoleRelatedClub = (InputName, token) => {
     },
   });
 };
+
