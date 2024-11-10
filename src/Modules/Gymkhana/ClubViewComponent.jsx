@@ -11,6 +11,7 @@ import CoordinatorMembersWithProviders from "./CoordinatorMembersTable";
 import BudgetApprovalsWithProviders from "./BudgetApprovalTable";
 import { useGetCurrentLoginnedRoleRelatedClub } from "./BackendLogic/ApiRoutes";
 
+
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
 const CustomTable = lazy(() => import("./CustomTable"));
 const EventForm = lazy(() => import("./EventForm"));

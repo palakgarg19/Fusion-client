@@ -58,7 +58,6 @@ function EventsApprovalForm({
       start_date: (value) => (!value ? "Start date cannot be empty" : null),
     },
   });
-
   const mutation = useMutation({
     mutationFn: (newEventData) => {
       return axios.put(
@@ -110,6 +109,7 @@ function EventsApprovalForm({
           </Alert>
         )}
 
+
         {errorMessage && (
           <Alert title="Error" color="red" mt="md">
             {errorMessage}
@@ -127,7 +127,6 @@ function EventsApprovalForm({
           disabled={editMode && disabledFields.includes("event_name")}
           withAsterisk
         />
-
         <TextInput
           label="Details"
           placeholder="Enter the event details"
@@ -139,7 +138,6 @@ function EventsApprovalForm({
           disabled={editMode && disabledFields.includes("details")}
           withAsterisk
         />
-
         <TextInput
           label="Venue"
           placeholder="Enter the venue"
@@ -151,7 +149,6 @@ function EventsApprovalForm({
           disabled={editMode && disabledFields.includes("venue")}
           withAsterisk
         />
-
         <TextInput
           label="Incharge"
           placeholder="Incharge"
@@ -206,10 +203,10 @@ function EventsApprovalForm({
             form.setFieldValue("end_time", event.currentTarget.value)
           }
           error={form.errors.end_time}
+
           disabled={editMode && disabledFields.includes("end_time")}
           withAsterisk
         />
-
         <TextInput
           label="Event Poster"
           placeholder="Event Poster"
@@ -228,12 +225,12 @@ function EventsApprovalForm({
           </Button>
         </Group>
       </form>
-
       <Modal
         opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Success!"
       >
+
         <p>
           Your event has been successfully {editMode ? "updated" : "submitted"}!
         </p>
@@ -242,6 +239,7 @@ function EventsApprovalForm({
     </Container>
   );
 }
+
 
 EventsApprovalForm.propTypes = {
   clubName: PropTypes.string.isRequired,
@@ -263,6 +261,7 @@ function EventForm({ clubName }) {
 EventForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
+
 
 export { EventsApprovalForm };
 export default EventForm;

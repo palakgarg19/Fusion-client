@@ -29,7 +29,6 @@ function GymkhanaDashboard() {
   const [value, setValue] = useState("Select a Club");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedClub, setSelectedClub] = useState("All Clubs");
-
   const tabs = [
     { title: "Clubs" },
     { title: "Calendar" },
