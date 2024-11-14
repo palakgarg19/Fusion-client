@@ -15,7 +15,6 @@ import {
   Button,
   CloseButton,
   Group,
-  Alert,
   Divider,
   Pill,
   ScrollArea,
@@ -37,7 +36,6 @@ import {
 
 import { EventsApprovalForm } from "./EventForm";
 
-
 function EventApprovals({ clubName }) {
   const user = useSelector((state) => state.user);
   const userRole = user.role;
@@ -46,10 +44,8 @@ function EventApprovals({ clubName }) {
   const [validationErrors] = useState({});
   const [commentValue, setCommentValue] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { data: commentsData } = useGetCommentsEventInfo(
-    selectedEvent?.id,
-    token,
-  );
+  const { data: commentsData, refetch: refetchComments } =
+    useGetCommentsEventInfo(selectedEvent?.id, token);
 
   const columns = useMemo(
     () => [
@@ -75,7 +71,6 @@ function EventApprovals({ clubName }) {
     isFetching: isFetchingEvents,
     isLoading: isLoadingEvents,
   } = useGetUpcomingEvents(token);
-
 
   const openViewModal = (event) => {
     setSelectedEvent(event);
@@ -131,12 +126,13 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const handleCommentSubmit = (values) => {
     mutation.mutate(values, {
       onSuccess: (response) => {
         console.log("Successfully comment posted!!!", response.data);
-        alert("Successfully comment posted!!!");
+        setCommentValue(""); // Clear the comment input field
+        refetchComments(); // Refresh the comments list
+        // alert("Successfully comment posted!!!");
       },
       onError: (error) => {
         console.error("Error during posting comment", error);
@@ -144,7 +140,6 @@ function EventApprovals({ clubName }) {
       },
     });
   };
-
 
   const approveFICMutation = useMutation({
     mutationFn: (eventId) => {
@@ -156,16 +151,13 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const approveCounsellorMutation = useMutation({
     mutationFn: (eventId) => approveCounsellorEventButton(eventId, token),
     onSuccess: () => {
-
       alert("Approved by Counsellor");
       closeViewModal();
     },
   });
-
 
   const approveDeanMutation = useMutation({
     mutationFn: (eventId) => approveDeanEventButton(eventId, token),
@@ -175,7 +167,6 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const rejectMutation = useMutation({
     mutationFn: (eventId) => rejectEventButton(eventId, token),
     onSuccess: () => {
@@ -183,7 +174,6 @@ function EventApprovals({ clubName }) {
       closeViewModal();
     },
   });
-
 
   const modifyMutation = useMutation({
     mutationFn: (eventId) => modifyEventButton(eventId, token),
@@ -210,7 +200,6 @@ function EventApprovals({ clubName }) {
   const handleModifyButton = (eventId) => {
     modifyMutation.mutate(eventId);
   };
-
 
   const table = useMantineReactTable({
     columns,
@@ -273,12 +262,10 @@ function EventApprovals({ clubName }) {
         onClose={closeViewModal}
         w="40%"
       >
-
         {selectedEvent && (
           <Stack
             spacing="md"
             sx={{
-
               width: "100%",
               padding: "20px",
               border: "1px solid #dfe1e5",
@@ -288,32 +275,29 @@ function EventApprovals({ clubName }) {
             }}
           >
             <Box>
-              <Stack spacing="xs">
+              <Stack>
                 <Text
-                  size="lg"
+                  size="25px"
                   style={{ fontWeight: 900 }}
                   align="center"
-                  mb="xs"
+                  mb="10px"
                 >
                   {selectedEvent.event_name}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Date Range:
-                  </span>
-                  {selectedEvent.start_date} - {selectedEvent.end_date}
+                <Text size="15px" weight={700}>
+                  <b>Date:</b> {selectedEvent.start_date} to{" "}
+                  {selectedEvent.end_date}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Venue:
-                  </span>
+                <Text size="15px" weight={700}>
+                  <b>Time:</b> {selectedEvent.start_time} to{" "}
+                  {selectedEvent.end_time}
+                </Text>
+                <Text size="15px" weight={700}>
+                  <b>Venue: </b>
                   {selectedEvent.venue}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Description:
-                  </span>{" "}
-                  {selectedEvent.details}
+                <Text size="15px" weight={700}>
+                  <b>Description: </b> {selectedEvent.details}
                 </Text>
               </Stack>
 
@@ -321,30 +305,41 @@ function EventApprovals({ clubName }) {
 
               <Box>
                 <Stack>
-                  <Text size="md" weight={700}>
+                  <Text size="md" weight={500}>
                     Comments:
                   </Text>
-                  <ScrollArea h={250}>
+                  <ScrollArea
+                    h={300}
+                    styles={{
+                      viewport: {
+                        paddingRight: "10px", // Add padding to avoid overlap
+                      },
+                      scrollbar: {
+                        position: "absolute",
+                        right: 0,
+                        width: "8px",
+                      },
+                    }}
+                  >
                     {commentsData?.map((comment) => (
                       <Box
-
                         key={comment.comment}
                         my="sm"
                         style={{
-                          border: "solid 2px black",
+                          border: " solid 1px lightgray",
                           borderRadius: "5px",
-                          padding: "2px",
                         }}
                       >
-                        <Pill weight={900} size="md" c="blue" mb="5px">
+                        <Pill weight={900} size="xs" c="blue" ml="5px">
                           {comment.commentator_designation}
                         </Pill>
-                        <Text size="sm" p="2px" radius="lg">
+                        <Text size="sm" pl="10px" radius="lg">
                           {comment.comment}{" "}
                         </Text>
                         <Group justify="end">
-                          <Pill>{comment.comment_date}</Pill>
-                          <Pill>{comment.comment_time}</Pill>
+                          <Pill size="xs" mr="2px" mb="1px">
+                            {comment.comment_date}, {comment.comment_time}
+                          </Pill>
                         </Group>
                       </Box>
                     ))}
@@ -508,6 +503,5 @@ function EventApprovalsWithProviders({ clubName }) {
 EventApprovalsWithProviders.propTypes = {
   clubName: PropTypes.string,
 };
-
 
 export default EventApprovalsWithProviders;
