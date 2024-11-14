@@ -16,7 +16,7 @@ import {
   ScrollArea,
   Pill,
 } from "@mantine/core";
-import { IconEye } from "@tabler/icons-react";
+import { IconEye, IconEdit } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -31,16 +31,14 @@ import {
   modifyBudgetButton,
 } from "./BackendLogic/ApiRoutes"; // adjust the import path
 
-function BudgetApprovals({ clubName }) {
+function BudgetApprovals() {
   const token = localStorage.getItem("authToken");
   const user = useSelector((state) => state.user);
   const userRole = user.role;
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [commentValue, setCommentValue] = useState("");
-  const { data: commentsData } = useGetCommentsBudgetInfo(
-    selectedBudget?.id,
-    token,
-  );
+  const { data: commentsData, refetch: refetchComments } =
+    useGetCommentsBudgetInfo(selectedBudget?.id, token);
 
   const columns = useMemo(
     () => [
@@ -119,7 +117,7 @@ function BudgetApprovals({ clubName }) {
                   // TODO: Implement Looooogic for this
                 }}
               >
-                E
+                <IconEdit />
               </ActionIcon>
             </Tooltip>
           )}
@@ -152,11 +150,14 @@ function BudgetApprovals({ clubName }) {
 
   const handleCommentSubmit = (values) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        alert("Comment posted successfully!");
+      onSuccess: (response) => {
+        console.log("Successfully comment posted!!!", response.data);
+        setCommentValue(""); // Clear the comment input field
+        refetchComments(); // Refresh the comments list
       },
-      onError: () => {
-        alert("Error posting comment");
+      onError: (error) => {
+        console.error("Error during posting comment", error);
+        alert("Error during posting comment");
       },
     });
   };
@@ -234,25 +235,20 @@ function BudgetApprovals({ clubName }) {
             }}
           >
             <Box>
-              <Stack spacing="xs">
+              <Stack>
                 <Text
-                  size="lg"
+                  size="25px"
                   style={{ fontWeight: 900 }}
                   align="center"
-                  mb="xs"
+                  mb="10px"
                 >
                   {selectedBudget.budget_for}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Amount Requested:
-                  </span>{" "}
-                  {selectedBudget.budget_amt}
+                <Text size="15px" weight={700}>
+                  <b>Amount Requested: </b> {selectedBudget.budget_amt}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Description:
-                  </span>{" "}
+                <Text size="15px" weight={700}>
+                  <b>Description: </b>
                   {selectedBudget.description}
                 </Text>
               </Stack>
@@ -261,29 +257,41 @@ function BudgetApprovals({ clubName }) {
 
               <Box>
                 <Stack>
-                  <Text size="md" weight={700}>
+                  <Text size="md" weight={500}>
                     Comments:
                   </Text>
-                  <ScrollArea h={250}>
+                  <ScrollArea
+                    h={300}
+                    styles={{
+                      viewport: {
+                        paddingRight: "10px", // Add padding to avoid overlap
+                      },
+                      scrollbar: {
+                        position: "absolute",
+                        right: 0,
+                        width: "8px",
+                      },
+                    }}
+                  >
                     {commentsData?.map((comment) => (
                       <Box
                         key={comment.event_index}
                         my="sm"
                         style={{
-                          border: "solid 2px black",
+                          border: " solid 1px lightgray",
                           borderRadius: "5px",
-                          padding: "2px",
                         }}
                       >
-                        <Pill weight={900} size="md" c="blue" mb="5px">
+                        <Pill weight={900} size="xs" c="blue" mb="5px">
                           {comment.commentator_designation}
                         </Pill>
-                        <Text size="sm" p="2px" radius="lg">
+                        <Text size="sm" p="10px" radius="lg">
                           {comment.comment}{" "}
                         </Text>
                         <Group justify="end">
-                          <Pill>{comment.comment_date}</Pill>
-                          <Pill>{comment.comment_time}</Pill>
+                          <Pill size="xs" mr="2px" mb="1px">
+                            {comment.comment_date}, {comment.comment_time}
+                          </Pill>
                         </Group>
                       </Box>
                     ))}
@@ -387,9 +395,6 @@ function BudgetApprovalsWithProviders({ clubName }) {
   return <BudgetApprovals clubName={clubName} />;
 }
 BudgetApprovalsWithProviders.propTypes = {
-  clubName: PropTypes.string,
-};
-BudgetApprovals.propTypes = {
   clubName: PropTypes.string,
 };
 
