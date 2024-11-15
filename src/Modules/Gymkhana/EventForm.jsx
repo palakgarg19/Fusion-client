@@ -66,6 +66,7 @@ function EventsApprovalForm({
         newEventData,
         {
           headers: {
+            "Content-Type": "multipart/form-data", // For file uploads
             Authorization: `Token ${token}`,
           },
         },

@@ -34,10 +34,11 @@ import {
 import { BudgetApprovalForm } from "./BudgetForm";
 
 function BudgetApprovals({ clubName }) {
-  const token = localStorage.getItem("authToken");
   const user = useSelector((state) => state.user);
   const userRole = user.role;
+  const token = localStorage.getItem("authToken");
   const [selectedBudget, setSelectedBudget] = useState(null);
+  const [validationErrors] = useState({});
   const [commentValue, setCommentValue] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: commentsData, refetch: refetchComments } =
@@ -62,7 +63,7 @@ function BudgetApprovals({ clubName }) {
         header: "Remarks",
       },
     ],
-    [],
+    [validationErrors],
   );
 
   const {
@@ -94,7 +95,7 @@ function BudgetApprovals({ clubName }) {
     mutationFn: (updatedBudgetData) => {
       return axios.put(
         "http://127.0.0.1:8000/gymkhana/api/update_budget/",
-        updatedBudgteData,
+        updatedBudgetData,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -379,7 +380,7 @@ function BudgetApprovals({ clubName }) {
                         FIC Approve
                       </Button>
                     )}
-                    {userRole === "Dean_s" && (
+                    {userRole === "Dean" && (
                       <Button
                         color="blue"
                         onClick={() => {
@@ -429,31 +430,14 @@ function BudgetApprovals({ clubName }) {
         {selectedBudget && (
           <BudgetApprovalForm
             clubName={clubName}
-            // initialValues={{
-            //   ...selectedBudget,
-            //   start_date: new Date(selectedBudget.start_date),
-            //   end_date: new Date(selectedBudget.end_date),
-            //   start_time: selectedBudget.start_time,
-            //   end_time: selectedBudget.end_time,
-            // }}
+            initialValues={{
+              ...selectedBudget,
+            }}
             onSubmit={(values) => {
               const formData = new FormData();
 
               // Add the text data (details)
               formData.append("budget_amt", values.budget_amt);
-
-              // Add the file (poster), check if a new file is selected
-              if (values.budget_file) {
-                formData.append("budget_file", values.budget_file);
-              }
-
-              if (values.remarks) {
-                formData.append("remarks", values.remarks);
-              }
-
-              if (values.description) {
-                formData.append("description", values.description);
-              }
 
               // Add the ID of the event
               formData.append("id", selectedBudget.id);
@@ -462,7 +446,13 @@ function BudgetApprovals({ clubName }) {
               updateBudgetMutation.mutate(formData);
             }}
             editMode
-            disabledFields={["budget_for"]}
+            disabledFields={[
+              "budget_for",
+              "budget_file",
+              "description",
+              "status",
+              "remarks",
+            ]}
           />
         )}
       </Modal>
