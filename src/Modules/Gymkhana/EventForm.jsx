@@ -7,6 +7,7 @@ import {
   Container,
   Alert,
   Modal,
+  FileInput,
 } from "@mantine/core";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
@@ -71,14 +72,14 @@ function EventsApprovalForm({
       );
     },
     onSuccess: (response) => {
-      console.log("Successfully registered:", response.data);
-      setSuccessMessage("Event registered successfully!");
+      console.log("Successfully requested:", response.data);
+      setSuccessMessage("Event request forwarded successfully!");
       setIsModalOpen(true);
       form.reset();
     },
     onError: (error) => {
-      console.error("Error during registration:", error);
-      setErrorMessage("Registration failed. Please try again.");
+      console.error("Error during forwarding request:", error);
+      setErrorMessage("Request failed. Please try again.");
     },
   });
 
@@ -108,7 +109,6 @@ function EventsApprovalForm({
             {successMessage}
           </Alert>
         )}
-
 
         {errorMessage && (
           <Alert title="Error" color="red" mt="md">
@@ -203,20 +203,18 @@ function EventsApprovalForm({
             form.setFieldValue("end_time", event.currentTarget.value)
           }
           error={form.errors.end_time}
-
           disabled={editMode && disabledFields.includes("end_time")}
           withAsterisk
         />
-        <TextInput
+        <FileInput
           label="Event Poster"
-          placeholder="Event Poster"
+          placeholder="Upload Event Poster"
           value={form.values.event_poster}
-          onChange={(event) =>
-            form.setFieldValue("event_poster", event.currentTarget.value)
-          }
+          onChange={(file) => form.setFieldValue("event_poster", file)}
           error={form.errors.event_poster}
-          disabled={editMode && disabledFields.includes("event_poster")}
+          // disabled={editMode && disabledFields.includes("event_poster")}
           withAsterisk
+          accept=".pdf"
         />
 
         <Group position="center" mt="md">
@@ -230,7 +228,6 @@ function EventsApprovalForm({
         onClose={() => setIsModalOpen(false)}
         title="Success!"
       >
-
         <p>
           Your event has been successfully {editMode ? "updated" : "submitted"}!
         </p>
@@ -239,7 +236,6 @@ function EventsApprovalForm({
     </Container>
   );
 }
-
 
 EventsApprovalForm.propTypes = {
   clubName: PropTypes.string.isRequired,
@@ -261,7 +257,6 @@ function EventForm({ clubName }) {
 EventForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
-
 
 export { EventsApprovalForm };
 export default EventForm;

@@ -191,6 +191,9 @@ function BudgetApprovalForm({ clubName }) {
   );
 }
 
+BudgetApprovalForm.propTypes = {
+  clubName: PropTypes.string.isRequired,
+};
 export { BudgetApprovalForm };
 
 function BudgetForm({ clubName }) {

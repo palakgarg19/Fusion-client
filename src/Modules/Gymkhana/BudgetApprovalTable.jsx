@@ -16,7 +16,7 @@ import {
   ScrollArea,
   Pill,
 } from "@mantine/core";
-import { IconEye, IconEdit } from "@tabler/icons-react";
+import { IconEye, IconEdit, IconSend } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -29,14 +29,17 @@ import {
   approveDeanBudgetButton,
   rejectBudgetButton,
   modifyBudgetButton,
-} from "./BackendLogic/ApiRoutes"; // adjust the import path
+} from "./BackendLogic/ApiRoutes";
 
-function BudgetApprovals() {
+import { BudgetApprovalForm } from "./BudgetForm";
+
+function BudgetApprovals({ clubName }) {
   const token = localStorage.getItem("authToken");
   const user = useSelector((state) => state.user);
   const userRole = user.role;
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [commentValue, setCommentValue] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: commentsData, refetch: refetchComments } =
     useGetCommentsBudgetInfo(selectedBudget?.id, token);
 
@@ -77,56 +80,31 @@ function BudgetApprovals() {
     setSelectedBudget(null);
   };
 
-  const table = useMantineReactTable({
-    columns,
-    data: fetchedBudgets,
-    enableEditing: true,
-    getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingBudgetsError
-      ? {
-          color: "red",
-          children: "Error loading data",
-        }
-      : undefined,
-    renderRowActions: ({ row }) => (
-      <Flex gap="md">
-        <Tooltip label="View">
-          <ActionIcon onClick={() => openViewModal(row.original)}>
-            <IconEye />
-          </ActionIcon>
-        </Tooltip>
+  const openEditModal = (budget) => {
+    setSelectedBudget(budget);
+    setIsEditModalOpen(true);
+  };
 
-        <Pill
-          bg={
-            row.original.status === "ACCEPT"
-              ? "green"
-              : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
-          }
-        >
-          {row.original.status}
-        </Pill>
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedBudget(null);
+  };
 
-        {row.original.status === "COORDINATOR" &&
-          userRole === "co-ordinator" && (
-            <Tooltip label="Edit">
-              <ActionIcon
-                color="blue"
-                onClick={() => {
-                  // TODO: Implement Looooogic for this
-                }}
-              >
-                <IconEdit />
-              </ActionIcon>
-            </Tooltip>
-          )}
-      </Flex>
-    ),
-    state: {
-      isLoading: isLoadingBudgets,
-      showAlertBanner: isLoadingBudgetsError,
-      showProgressBars: isFetchingBudgets,
+  const updateBudgetMutation = useMutation({
+    mutationFn: (updatedBudgetData) => {
+      return axios.put(
+        "http://127.0.0.1:8000/gymkhana/api/update_budget/",
+        updatedBudgteData,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      closeEditModal();
+      // You might want to refresh your events data here
     },
   });
 
@@ -217,11 +195,64 @@ function BudgetApprovals() {
   const handleModifyButton = (budgetId) => {
     modifyMutation.mutate(budgetId);
   };
+  const table = useMantineReactTable({
+    columns,
+    data: fetchedBudgets,
+    enableEditing: true,
+    getRowId: (row) => row.id,
+    mantineToolbarAlertBannerProps: isLoadingBudgetsError
+      ? {
+          color: "red",
+          children: "Error loading data",
+        }
+      : undefined,
+    renderRowActions: ({ row }) => (
+      <Flex gap="md">
+        <Tooltip label="View">
+          <ActionIcon onClick={() => openViewModal(row.original)}>
+            <IconEye />
+          </ActionIcon>
+        </Tooltip>
+        {row.original.status === "COORDINATOR" &&
+          userRole === "co-ordinator" && (
+            <Tooltip label="Edit">
+              <ActionIcon
+                color="blue"
+                onClick={() => openEditModal(row.original)}
+              >
+                <IconEdit />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        <Pill
+          bg={
+            row.original.status === "ACCEPT"
+              ? "green"
+              : row.original.status === "REJECT"
+                ? "red"
+                : "yellow"
+          }
+        >
+          {row.original.status}
+        </Pill>
+      </Flex>
+    ),
+    state: {
+      isLoading: isLoadingBudgets,
+      showAlertBanner: isLoadingBudgetsError,
+      showProgressBars: isFetchingBudgets,
+    },
+  });
 
   return (
     <>
       <MantineReactTable table={table} />
-      <Modal opened={!!selectedBudget} onClose={closeViewModal} w="40%">
+      {/* View Modal */}
+      <Modal
+        opened={!!selectedBudget && !isEditModalOpen}
+        onClose={closeViewModal}
+        w="40%"
+      >
         {selectedBudget && (
           <Stack
             spacing="md"
@@ -304,7 +335,7 @@ function BudgetApprovals() {
                       onChange={(event) =>
                         setCommentValue(event.currentTarget.value)
                       }
-                      w="290px"
+                      w="330px"
                       rightSection={
                         <CloseButton
                           aria-label="Clear input"
@@ -326,7 +357,7 @@ function BudgetApprovals() {
                       }}
                       color="blue"
                     >
-                      Submit
+                      <IconSend />
                     </Button>
                   </Group>
                 </Stack>
@@ -348,7 +379,7 @@ function BudgetApprovals() {
                         FIC Approve
                       </Button>
                     )}
-                    {userRole === "Dean" && (
+                    {userRole === "Dean_s" && (
                       <Button
                         color="blue"
                         onClick={() => {
@@ -387,10 +418,61 @@ function BudgetApprovals() {
           </Stack>
         )}
       </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        opened={isEditModalOpen}
+        onClose={closeEditModal}
+        title="Edit Budget"
+        size="lg"
+      >
+        {selectedBudget && (
+          <BudgetApprovalForm
+            clubName={clubName}
+            // initialValues={{
+            //   ...selectedBudget,
+            //   start_date: new Date(selectedBudget.start_date),
+            //   end_date: new Date(selectedBudget.end_date),
+            //   start_time: selectedBudget.start_time,
+            //   end_time: selectedBudget.end_time,
+            // }}
+            onSubmit={(values) => {
+              const formData = new FormData();
+
+              // Add the text data (details)
+              formData.append("budget_amt", values.budget_amt);
+
+              // Add the file (poster), check if a new file is selected
+              if (values.budget_file) {
+                formData.append("budget_file", values.budget_file);
+              }
+
+              if (values.remarks) {
+                formData.append("remarks", values.remarks);
+              }
+
+              if (values.description) {
+                formData.append("description", values.description);
+              }
+
+              // Add the ID of the event
+              formData.append("id", selectedBudget.id);
+
+              // Now, submit the formData to the backend using the mutation
+              updateBudgetMutation.mutate(formData);
+            }}
+            editMode
+            disabledFields={["budget_for"]}
+          />
+        )}
+      </Modal>
     </>
   );
 }
 
+BudgetApprovals.propTypes = {
+  clubName: PropTypes.string,
+};
 function BudgetApprovalsWithProviders({ clubName }) {
   return <BudgetApprovals clubName={clubName} />;
 }

@@ -19,7 +19,7 @@ import {
   Pill,
   ScrollArea,
 } from "@mantine/core";
-import { IconEye, IconEdit } from "@tabler/icons-react";
+import { IconEye, IconEdit, IconSend } from "@tabler/icons-react";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -219,19 +219,6 @@ function EventApprovals({ clubName }) {
             <IconEye />
           </ActionIcon>
         </Tooltip>
-
-        <Pill
-          bg={
-            row.original.status === "ACCEPT"
-              ? "green"
-              : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
-          }
-        >
-          {row.original.status}
-        </Pill>
-
         {row.original.status === "COORDINATOR" &&
           userRole === "co-ordinator" && (
             <Tooltip label="Edit">
@@ -243,6 +230,17 @@ function EventApprovals({ clubName }) {
               </ActionIcon>
             </Tooltip>
           )}
+        <Pill
+          bg={
+            row.original.status === "ACCEPT"
+              ? "green"
+              : row.original.status === "REJECT"
+                ? "red"
+                : "yellow"
+          }
+        >
+          {row.original.status}
+        </Pill>
       </Flex>
     ),
     state: {
@@ -352,7 +350,7 @@ function EventApprovals({ clubName }) {
                       onChange={(event) =>
                         setCommentValue(event.currentTarget.value)
                       }
-                      w="290px"
+                      w="330px"
                       rightSection={
                         <CloseButton
                           aria-label="Clear input"
@@ -374,7 +372,7 @@ function EventApprovals({ clubName }) {
                       }}
                       color="blue"
                     >
-                      Submit
+                      <IconSend />
                     </Button>
                   </Group>
                 </Stack>
@@ -385,7 +383,7 @@ function EventApprovals({ clubName }) {
                 userRole === "Counsellor" ||
                 userRole === "Professor") && (
                 <Box mt="md">
-                  <Group>
+                  <Group justify="center">
                     {(userRole === "FIC" || userRole === "Professor") && (
                       <Button
                         color="blue"
