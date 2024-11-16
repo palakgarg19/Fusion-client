@@ -416,7 +416,7 @@ function EventApprovals({ clubName }) {
                       </Button>
                     )}
                     <Button
-                      color="red"
+                      color="blue"
                       onClick={() => {
                         handleRejectButton(selectedEvent.id);
                       }}
@@ -424,7 +424,7 @@ function EventApprovals({ clubName }) {
                       Reject
                     </Button>
                     <Button
-                      color="yellow"
+                      color="blue"
                       onClick={() => {
                         handleModifyButton(selectedEvent.id);
                       }}

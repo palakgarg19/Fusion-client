@@ -365,7 +365,7 @@ function BudgetApprovals({ clubName }) {
               </Box>
 
               {(userRole === "FIC" ||
-                userRole === "Dean" ||
+                userRole === "Dean_s" ||
                 userRole === "Counsellor" ||
                 userRole === "Professor") && (
                 <Box mt="md">
@@ -380,7 +380,7 @@ function BudgetApprovals({ clubName }) {
                         FIC Approve
                       </Button>
                     )}
-                    {userRole === "Dean" && (
+                    {userRole === "Dean_s" && (
                       <Button
                         color="blue"
                         onClick={() => {
@@ -401,13 +401,13 @@ function BudgetApprovals({ clubName }) {
                       </Button>
                     )}
                     <Button
-                      color="red"
+                      color="blue"
                       onClick={() => handleRejectButton(selectedBudget.id)}
                     >
                       Reject
                     </Button>
                     <Button
-                      color="yellow"
+                      color="blue"
                       onClick={() => handleModifyButton(selectedBudget.id)}
                     >
                       Modify
