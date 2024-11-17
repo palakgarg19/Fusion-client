@@ -73,6 +73,51 @@ function EventApprovals({ clubName }) {
     refetch: refetchEvents,
   } = useGetUpcomingEvents(token);
 
+
+  const filteredEvents = useMemo(() => {
+    return fetchedEvents.filter((event) => {
+      if (
+        (event.status.toLowerCase() === "coordinator" ||
+          event.status.toLowerCase() === "reject") &&
+        userRole.toLowerCase() === "co-ordinator"
+      ) {
+        return true;
+      }
+      if (event.status.toLowerCase() === "fic") {
+        if (
+          userRole.toLowerCase() === "co-ordinator" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor"
+        ) {
+          return true;
+        }
+      }
+      if (event.status.toLowerCase() === "counsellor") {
+        if (
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      if (event.status.toLowerCase() === "dean") {
+        if (
+          userRole.toLowerCase() === "dean" ||
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }, [fetchedEvents, userRole]);
+
+
   const openViewModal = (event) => {
     setSelectedEvent(event);
   };
@@ -207,10 +252,85 @@ function EventApprovals({ clubName }) {
   const handleModifyButton = (eventId) => {
     modifyMutation.mutate(eventId);
   };
+  const renderRoleBasedActions = useMemo(() => {
+    if (!selectedEvent) return null;
+
+    if (
+      selectedEvent.status === "FIC" &&
+      (userRole === "Professor" || userRole === "Assistant Professor")
+    ) {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleFICApproveButton(selectedEvent.id)}
+          >
+            FIC Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedEvent.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedEvent.status === "COUNSELLOR" && userRole === "Counsellor") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleCounsellorApproveButton(selectedEvent.id)}
+          >
+            Counsellor Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedEvent.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedEvent.status === "DEAN" && userRole === "Dean") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleDeanApproveButton(selectedEvent.id)}
+          >
+            Final Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+        </>
+      );
+    }
+
+    return null;
+  }, [selectedEvent, userRole]);
 
   const table = useMantineReactTable({
     columns,
-    data: fetchedEvents,
+    data: filteredEvents,
     enableEditing: true,
     getRowId: (row) => row.id,
     mantineToolbarAlertBannerProps: isLoadingEventsError
@@ -350,99 +470,53 @@ function EventApprovals({ clubName }) {
                     ))}
                   </ScrollArea>
 
-                  <Group position="apart" align="center" w="100%">
-                    <Flex align="center" gap="sm" style={{ flexGrow: 1 }}>
+
+                  <Group position="apart" align="center">
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+
                       <Input
                         placeholder="Add a comment"
                         value={commentValue}
                         onChange={(event) =>
                           setCommentValue(event.currentTarget.value)
                         }
-                        w="100%" // Takes full width of the parent container
-                        rightSection={
-                          <CloseButton
-                            aria-label="Clear input"
-                            onClick={() => setCommentValue("")}
-                            style={{
-                              display: commentValue ? undefined : "none",
-                            }}
-                          />
-                        }
+                        style={{ paddingRight: "30px", width: "290px" }} // Add padding to make space for the CloseButton
                       />
-                      <Button
-                        onClick={() => {
-                          const objectComment = {
-                            userRole,
-                            commentValue,
-                            selectedEvent,
-                          };
-                          handleCommentSubmit(objectComment);
-                        }}
-                        color="blue"
-                      >
-                        <IconSend />
-                      </Button>
-                    </Flex>
+                      {commentValue && (
+                        <CloseButton
+                          aria-label="Clear input"
+                          onClick={() => setCommentValue("")}
+                          style={{
+                            position: "absolute",
+                            right: "5px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const objectComment = {
+                          userRole,
+                          commentValue,
+                          selectedEvent,
+                        };
+                        handleCommentSubmit(objectComment);
+                      }}
+                      color="blue"
+                    >
+                      Submit
+                    </Button>
+                    {renderRoleBasedActions}
                   </Group>
                 </Stack>
               </Box>
-
-              {(userRole === "FIC" ||
-                userRole === "Dean_s" ||
-                userRole === "Counsellor" ||
-                userRole === "Professor") && (
-                <Box mt="md">
-                  <Group justify="center">
-                    {(userRole === "FIC" || userRole === "Professor") && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleFICApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        FIC Approve
-                      </Button>
-                    )}
-
-                    {userRole === "Dean_s" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleDeanApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        Dean Approve
-                      </Button>
-                    )}
-                    {userRole === "Counsellor" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleCounsellorApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        Counsellor Approve
-                      </Button>
-                    )}
-                    <Button
-                      color="blue"
-                      onClick={() => {
-                        handleRejectButton(selectedEvent.id);
-                      }}
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      color="blue"
-                      onClick={() => {
-                        handleModifyButton(selectedEvent.id);
-                      }}
-                    >
-                      Modify
-                    </Button>
-                  </Group>
-                </Box>
-              )}
             </Box>
           </Stack>
         )}

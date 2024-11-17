@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core";
+import { Suspense, lazy } from "react";
 import "@mantine/core/styles.css";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Notifications } from "@mantine/notifications";
@@ -9,9 +10,10 @@ import LoginPage from "./pages/login";
 import ForgotPassword from "./pages/forgotPassword";
 import AcademicPage from "./Modules/Academic/index";
 import ValidateAuth from "./helper/validateauth";
-import GymkhanaDashboard from "./Modules/Gymkhana/GymkhanaDashboard.jsx";
-import Test from "./Modules/Gymkhana/Test.jsx";
 
+const GymkhanaDashboard = lazy(
+  () => import("./Modules/Gymkhana/GymkhanaDashboard.jsx"),
+);
 export default function App() {
   const location = useLocation();
   return (
@@ -56,11 +58,12 @@ export default function App() {
           path="/GymKhana"
           element={
             <Layout>
-              <GymkhanaDashboard />
+              <Suspense fallback={<div>Loading .... </div>}>
+                <GymkhanaDashboard />
+              </Suspense>
             </Layout>
           }
         />
-        <Route path="/Test" element={<Test />} />
       </Routes>
     </MantineProvider>
   );

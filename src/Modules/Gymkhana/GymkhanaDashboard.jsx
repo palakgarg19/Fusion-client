@@ -9,7 +9,7 @@ import ClubFilter from "./calender/ClubFilter";
 import DateSelector from "./calender/DateSelector";
 import EventCalendar from "./calender/EventCalender";
 import EventCard from "./calender/EventCard";
-import CustomTable from "./CustomTable";
+// import CustomTable from "./CustomTable";
 import { festColumns, festData } from "./makeData";
 import {
   useGetClubMembers,
@@ -20,6 +20,7 @@ import {
 } from "./BackendLogic/ApiRoutes";
 
 const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
+const CustomTable = lazy(() => import("./CustomTable"));
 
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
@@ -150,6 +151,13 @@ function GymkhanaDashboard() {
                       return true;
                     return false;
                   })}
+                  eventsData={[...upcomingEvents, ...pastEvents]
+                    .filter((item) => {
+                      if (item.club === value && item.status === "ACCEPT")
+                        return true;
+                      return false;
+                    })
+                    .sort((a, b) => a.end_date < b.end_date)}
                   membersColumns={[
                     {
                       accessorKey: "club", // Key in your data object
@@ -305,8 +313,8 @@ function GymkhanaDashboard() {
       )}
       {activeTab === "3" && (
         <Box mt="10px">
-          <Suspense fallback={<div>Loading Events Table for you ...</div>}>
-            <div style={{ marginBottom: "20px" }}>
+          <Box>
+            <Suspense fallback={<div>Loading Events Table for you ...</div>}>
               {upcomingEvents && (
                 <CustomTable
                   data={upcomingEvents}
@@ -339,41 +347,47 @@ function GymkhanaDashboard() {
                   TableName="Upcoming Events"
                 />
               )}
-            </div>
-            {pastEvents && (
-              <CustomTable
-                data={pastEvents}
-                columns={[
-                  { accessorKey: "id", header: "ID" },
-                  { accessorKey: "club", header: "Club" },
-                  { accessorKey: "event_name", header: "Event Name" },
-                  { accessorKey: "incharge", header: "Incharge" },
-                  { accessorKey: "venue", header: "Venue" },
-                  {
-                    accessorKey: "start_date",
-                    header: "Start Date",
-                    render: (data) =>
-                      new Date(data.start_date).toLocaleDateString(),
-                  },
-                  {
-                    accessorKey: "end_date",
-                    header: "End Date",
-                    render: (data) =>
-                      new Date(data.end_date).toLocaleDateString(),
-                  },
-                  {
-                    accessorKey: "start_time",
-                    header: "Start Time",
-                    render: (data) => data.start_time.substring(0, 5),
-                  },
-                  { accessorKey: "status", header: "Status" },
-                  { accessorKey: "details", header: "Details" },
-                ]}
-                TableName="Past Events"
-              />
-            )}
-          </Suspense>
-          {/* Need to make a Table with previous Events in Campus */}
+
+            </Suspense>
+          </Box>
+          <Box>
+            <Suspense fallback={<div>Loading Events Table for you ...</div>}>
+              {pastEvents && (
+                <CustomTable
+                  data={pastEvents}
+                  columns={[
+                    { accessorKey: "id", header: "ID" },
+                    { accessorKey: "club", header: "Club" },
+                    { accessorKey: "event_name", header: "Event Name" },
+                    { accessorKey: "incharge", header: "Incharge" },
+                    { accessorKey: "venue", header: "Venue" },
+                    {
+                      accessorKey: "start_date",
+                      header: "Start Date",
+                      render: (data) =>
+                        new Date(data.start_date).toLocaleDateString(),
+                    },
+                    {
+                      accessorKey: "end_date",
+                      header: "End Date",
+                      render: (data) =>
+                        new Date(data.end_date).toLocaleDateString(),
+                    },
+                    {
+                      accessorKey: "start_time",
+                      header: "Start Time",
+                      render: (data) => data.start_time.substring(0, 5),
+                    },
+                    { accessorKey: "status", header: "Status" },
+                    { accessorKey: "details", header: "Details" },
+                  ]}
+                  TableName="Past Events"
+                />
+              )}
+            </Suspense>
+          </Box>
+
+         
         </Box>
       )}
     </>
