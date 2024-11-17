@@ -306,38 +306,40 @@ function GymkhanaDashboard() {
       {activeTab === "3" && (
         <Box mt="10px">
           <Suspense fallback={<div>Loading Events Table for you ...</div>}>
-            {upcomingEvents && (
-              <CustomTable
-                data={upcomingEvents}
-                columns={[
-                  { accessorKey: "id", header: "ID" },
-                  { accessorKey: "club", header: "Club" },
-                  { accessorKey: "event_name", header: "Event Name" },
-                  { accessorKey: "incharge", header: "Incharge" },
-                  { accessorKey: "venue", header: "Venue" },
-                  {
-                    accessorKey: "start_date",
-                    header: "Start Date",
-                    render: (data) =>
-                      new Date(data.start_date).toLocaleDateString(),
-                  },
-                  {
-                    accessorKey: "end_date",
-                    header: "End Date",
-                    render: (data) =>
-                      new Date(data.end_date).toLocaleDateString(),
-                  },
-                  {
-                    accessorKey: "start_time",
-                    header: "Start Time",
-                    render: (data) => data.start_time.substring(0, 5),
-                  },
-                  { accessorKey: "status", header: "Status" },
-                  { accessorKey: "details", header: "Details" },
-                ]}
-                TableName="Upcoming Events"
-              />
-            )}
+            <div style={{ marginBottom: "20px" }}>
+              {upcomingEvents && (
+                <CustomTable
+                  data={upcomingEvents}
+                  columns={[
+                    { accessorKey: "id", header: "ID" },
+                    { accessorKey: "club", header: "Club" },
+                    { accessorKey: "event_name", header: "Event Name" },
+                    { accessorKey: "incharge", header: "Incharge" },
+                    { accessorKey: "venue", header: "Venue" },
+                    {
+                      accessorKey: "start_date",
+                      header: "Start Date",
+                      render: (data) =>
+                        new Date(data.start_date).toLocaleDateString(),
+                    },
+                    {
+                      accessorKey: "end_date",
+                      header: "End Date",
+                      render: (data) =>
+                        new Date(data.end_date).toLocaleDateString(),
+                    },
+                    {
+                      accessorKey: "start_time",
+                      header: "Start Time",
+                      render: (data) => data.start_time.substring(0, 5),
+                    },
+                    { accessorKey: "status", header: "Status" },
+                    { accessorKey: "details", header: "Details" },
+                  ]}
+                  TableName="Upcoming Events"
+                />
+              )}
+            </div>
             {pastEvents && (
               <CustomTable
                 data={pastEvents}

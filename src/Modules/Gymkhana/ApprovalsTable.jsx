@@ -70,6 +70,7 @@ function EventApprovals({ clubName }) {
     isError: isLoadingEventsError,
     isFetching: isFetchingEvents,
     isLoading: isLoadingEvents,
+    refetch: refetchEvents,
   } = useGetUpcomingEvents(token);
 
   const openViewModal = (event) => {
@@ -104,6 +105,7 @@ function EventApprovals({ clubName }) {
     },
     onSuccess: () => {
       closeEditModal();
+      refetchEvents();
       // You might want to refresh your events data here
     },
   });
@@ -148,6 +150,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by FIC");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -156,6 +159,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Counsellor");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -164,6 +168,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Dean Student");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -172,6 +177,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Rejected the event");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -179,6 +185,7 @@ function EventApprovals({ clubName }) {
     mutationFn: (eventId) => modifyEventButton(eventId, token),
     onSuccess: () => {
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -233,10 +240,10 @@ function EventApprovals({ clubName }) {
         <Pill
           bg={
             row.original.status === "ACCEPT"
-              ? "green"
+              ? "#B9FBC0"
               : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
+                ? "#FFA8A5"
+                : "#FFDB58"
           }
         >
           {row.original.status}
@@ -343,37 +350,39 @@ function EventApprovals({ clubName }) {
                     ))}
                   </ScrollArea>
 
-                  <Group position="apart" align="center">
-                    <Input
-                      placeholder="Add a comment"
-                      value={commentValue}
-                      onChange={(event) =>
-                        setCommentValue(event.currentTarget.value)
-                      }
-                      w="330px"
-                      rightSection={
-                        <CloseButton
-                          aria-label="Clear input"
-                          onClick={() => setCommentValue("")}
-                          style={{
-                            display: commentValue ? undefined : "none",
-                          }}
-                        />
-                      }
-                    />
-                    <Button
-                      onClick={() => {
-                        const objectComment = {
-                          userRole,
-                          commentValue,
-                          selectedEvent,
-                        };
-                        handleCommentSubmit(objectComment);
-                      }}
-                      color="blue"
-                    >
-                      <IconSend />
-                    </Button>
+                  <Group position="apart" align="center" w="100%">
+                    <Flex align="center" gap="sm" style={{ flexGrow: 1 }}>
+                      <Input
+                        placeholder="Add a comment"
+                        value={commentValue}
+                        onChange={(event) =>
+                          setCommentValue(event.currentTarget.value)
+                        }
+                        w="100%" // Takes full width of the parent container
+                        rightSection={
+                          <CloseButton
+                            aria-label="Clear input"
+                            onClick={() => setCommentValue("")}
+                            style={{
+                              display: commentValue ? undefined : "none",
+                            }}
+                          />
+                        }
+                      />
+                      <Button
+                        onClick={() => {
+                          const objectComment = {
+                            userRole,
+                            commentValue,
+                            selectedEvent,
+                          };
+                          handleCommentSubmit(objectComment);
+                        }}
+                        color="blue"
+                      >
+                        <IconSend />
+                      </Button>
+                    </Flex>
                   </Group>
                 </Stack>
               </Box>

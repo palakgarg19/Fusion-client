@@ -71,6 +71,7 @@ function BudgetApprovals({ clubName }) {
     isError: isLoadingBudgetsError,
     isFetching: isFetchingBudgets,
     isLoading: isLoadingBudgets,
+    refetch: refetchBudget,
   } = useGetUpcomingBudgets(token); // Fetch budgets for the club (implement the API call)
 
   const openViewModal = (budget) => {
@@ -105,6 +106,7 @@ function BudgetApprovals({ clubName }) {
     },
     onSuccess: () => {
       closeEditModal();
+      refetchBudget();
       // You might want to refresh your events data here
     },
   });
@@ -146,6 +148,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by FIC");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -154,6 +157,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Counsellor");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -162,6 +166,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Dean");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -170,6 +175,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Rejected");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -177,6 +183,7 @@ function BudgetApprovals({ clubName }) {
     mutationFn: (budgetId) => modifyBudgetButton(budgetId, token),
     onSuccess: () => {
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -228,10 +235,10 @@ function BudgetApprovals({ clubName }) {
         <Pill
           bg={
             row.original.status === "ACCEPT"
-              ? "green"
+              ? "#B9FBC0"
               : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
+                ? "#FFA8A5"
+                : "#FFDB58"
           }
         >
           {row.original.status}
@@ -329,37 +336,39 @@ function BudgetApprovals({ clubName }) {
                     ))}
                   </ScrollArea>
 
-                  <Group position="apart" align="center">
-                    <Input
-                      placeholder="Add a comment"
-                      value={commentValue}
-                      onChange={(event) =>
-                        setCommentValue(event.currentTarget.value)
-                      }
-                      w="330px"
-                      rightSection={
-                        <CloseButton
-                          aria-label="Clear input"
-                          onClick={() => setCommentValue("")}
-                          style={{
-                            display: commentValue ? undefined : "none",
-                          }}
-                        />
-                      }
-                    />
-                    <Button
-                      onClick={() => {
-                        const objectComment = {
-                          userRole,
-                          commentValue,
-                          selectedBudget,
-                        };
-                        handleCommentSubmit(objectComment);
-                      }}
-                      color="blue"
-                    >
-                      <IconSend />
-                    </Button>
+                  <Group position="apart" align="center" w="100%">
+                    <Flex align="center" gap="sm" style={{ flexGrow: 1 }}>
+                      <Input
+                        placeholder="Add a comment"
+                        value={commentValue}
+                        onChange={(event) =>
+                          setCommentValue(event.currentTarget.value)
+                        }
+                        w="100%"
+                        rightSection={
+                          <CloseButton
+                            aria-label="Clear input"
+                            onClick={() => setCommentValue("")}
+                            style={{
+                              display: commentValue ? undefined : "none",
+                            }}
+                          />
+                        }
+                      />
+                      <Button
+                        onClick={() => {
+                          const objectComment = {
+                            userRole,
+                            commentValue,
+                            selectedBudget,
+                          };
+                          handleCommentSubmit(objectComment);
+                        }}
+                        color="blue"
+                      >
+                        <IconSend />
+                      </Button>
+                    </Flex>
                   </Group>
                 </Stack>
               </Box>

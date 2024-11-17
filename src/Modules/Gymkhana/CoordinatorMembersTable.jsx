@@ -13,6 +13,13 @@ import { useGetClubMembers } from "./BackendLogic/ApiRoutes";
 function CoordinatorMembers({ clubName }) {
   const token = localStorage.getItem("authToken");
   const [validationErrors] = useState({});
+  const {
+    data: fetchedEvents = [],
+    isError: isLoadingEventsError,
+    isFetching: isFetchingEvents,
+    isLoading: isLoadingEvents,
+    refetch: refetchEvents,
+  } = useGetClubMembers(clubName, token);
   const approvemutation = useMutation({
     mutationFn: (clubMemberId) => {
       return axios.post(
@@ -28,6 +35,7 @@ function CoordinatorMembers({ clubName }) {
     onSuccess: (response) => {
       console.log("Successfully approved:", response.data);
       alert("Successfully approved");
+      refetchEvents();
       // setMessage({ type: "success", text: "Approval successful!" });
     },
     onError: (error) => {
@@ -54,6 +62,7 @@ function CoordinatorMembers({ clubName }) {
     onSuccess: (response) => {
       console.log("Successfully rejected:", response.data);
       alert("Successfully rejected");
+      refetchEvents();
       // setMessage({ type: "success", text: "Rejection successful!" });
     },
     onError: (error) => {
@@ -93,12 +102,6 @@ function CoordinatorMembers({ clubName }) {
     [validationErrors],
   );
 
-  const {
-    data: fetchedEvents = [],
-    isError: isLoadingEventsError,
-    isFetching: isFetchingEvents,
-    isLoading: isLoadingEvents,
-  } = useGetClubMembers(clubName, token);
   console.log(fetchedEvents, clubName);
   const table = useMantineReactTable({
     columns,
@@ -115,17 +118,27 @@ function CoordinatorMembers({ clubName }) {
       <Flex gap="md">
         {row.original.status === "open" ? (
           // Approve icon for open status
-          <Tooltip label="Approve">
-            <ActionIcon
-              color="green"
-              onClick={() => {
-                // setMessage({ type: "", text: "" });
-                approvemutation.mutate(row.original.id);
-              }}
-            >
-              <IconCheck /> {/* Approve icon */}
-            </ActionIcon>
-          </Tooltip>
+          <>
+            <Tooltip label="Approve">
+              <ActionIcon
+                color="green"
+                onClick={() => {
+                  // setMessage({ type: "", text: "" });
+                  approvemutation.mutate(row.original.id);
+                }}
+              >
+                <IconCheck /> {/* Approve icon */}
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Reject">
+              <ActionIcon
+                color="red"
+                onClick={() => rejectMutation.mutate(row.original.id)}
+              >
+                <IconTrash />
+              </ActionIcon>
+            </Tooltip>
+          </>
         ) : row.original.status === "member" ? (
           <Tooltip label="Delete">
             <ActionIcon
