@@ -15,7 +15,6 @@ import {
   Button,
   CloseButton,
   Group,
-  Alert,
   Divider,
   Pill,
   ScrollArea,
@@ -36,7 +35,6 @@ import {
 } from "./BackendLogic/ApiRoutes";
 
 import { EventsApprovalForm } from "./EventForm";
-
 
 function EventApprovals({ clubName }) {
   const user = useSelector((state) => state.user);
@@ -76,6 +74,48 @@ function EventApprovals({ clubName }) {
     isLoading: isLoadingEvents,
   } = useGetUpcomingEvents(token);
 
+  const filteredEvents = useMemo(() => {
+    return fetchedEvents.filter((event) => {
+      if (
+        (event.status.toLowerCase() === "coordinator" ||
+          event.status.toLowerCase() === "reject") &&
+        userRole.toLowerCase() === "co-ordinator"
+      ) {
+        return true;
+      }
+      if (event.status.toLowerCase() === "fic") {
+        if (
+          userRole.toLowerCase() === "co-ordinator" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor"
+        ) {
+          return true;
+        }
+      }
+      if (event.status.toLowerCase() === "counsellor") {
+        if (
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      if (event.status.toLowerCase() === "dean") {
+        if (
+          userRole.toLowerCase() === "dean" ||
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }, [fetchedEvents, userRole]);
 
   const openViewModal = (event) => {
     setSelectedEvent(event);
@@ -131,7 +171,6 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const handleCommentSubmit = (values) => {
     mutation.mutate(values, {
       onSuccess: (response) => {
@@ -145,7 +184,6 @@ function EventApprovals({ clubName }) {
     });
   };
 
-
   const approveFICMutation = useMutation({
     mutationFn: (eventId) => {
       approveFICEventButton(eventId, token);
@@ -156,16 +194,13 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const approveCounsellorMutation = useMutation({
     mutationFn: (eventId) => approveCounsellorEventButton(eventId, token),
     onSuccess: () => {
-
       alert("Approved by Counsellor");
       closeViewModal();
     },
   });
-
 
   const approveDeanMutation = useMutation({
     mutationFn: (eventId) => approveDeanEventButton(eventId, token),
@@ -175,7 +210,6 @@ function EventApprovals({ clubName }) {
     },
   });
 
-
   const rejectMutation = useMutation({
     mutationFn: (eventId) => rejectEventButton(eventId, token),
     onSuccess: () => {
@@ -183,7 +217,6 @@ function EventApprovals({ clubName }) {
       closeViewModal();
     },
   });
-
 
   const modifyMutation = useMutation({
     mutationFn: (eventId) => modifyEventButton(eventId, token),
@@ -210,11 +243,85 @@ function EventApprovals({ clubName }) {
   const handleModifyButton = (eventId) => {
     modifyMutation.mutate(eventId);
   };
+  const renderRoleBasedActions = useMemo(() => {
+    if (!selectedEvent) return null;
 
+    if (
+      selectedEvent.status === "FIC" &&
+      (userRole === "Professor" || userRole === "Assistant Professor")
+    ) {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleFICApproveButton(selectedEvent.id)}
+          >
+            FIC Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedEvent.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedEvent.status === "COUNSELLOR" && userRole === "Counsellor") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleCounsellorApproveButton(selectedEvent.id)}
+          >
+            Counsellor Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedEvent.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedEvent.status === "DEAN" && userRole === "Dean") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleDeanApproveButton(selectedEvent.id)}
+          >
+            Final Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedEvent.id)}
+          >
+            Reject
+          </Button>
+        </>
+      );
+    }
+
+    return null;
+  }, [selectedEvent, userRole]);
 
   const table = useMantineReactTable({
     columns,
-    data: fetchedEvents,
+    data: filteredEvents,
     enableEditing: true,
     getRowId: (row) => row.id,
     mantineToolbarAlertBannerProps: isLoadingEventsError
@@ -273,12 +380,10 @@ function EventApprovals({ clubName }) {
         onClose={closeViewModal}
         w="40%"
       >
-
         {selectedEvent && (
           <Stack
             spacing="md"
             sx={{
-
               width: "100%",
               padding: "20px",
               border: "1px solid #dfe1e5",
@@ -327,7 +432,6 @@ function EventApprovals({ clubName }) {
                   <ScrollArea h={250}>
                     {commentsData?.map((comment) => (
                       <Box
-
                         key={comment.comment}
                         my="sm"
                         style={{
@@ -351,23 +455,33 @@ function EventApprovals({ clubName }) {
                   </ScrollArea>
 
                   <Group position="apart" align="center">
-                    <Input
-                      placeholder="Add a comment"
-                      value={commentValue}
-                      onChange={(event) =>
-                        setCommentValue(event.currentTarget.value)
-                      }
-                      w="290px"
-                      rightSection={
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Input
+                        placeholder="Add a comment"
+                        value={commentValue}
+                        onChange={(event) =>
+                          setCommentValue(event.currentTarget.value)
+                        }
+                        style={{ paddingRight: "30px", width: "290px" }} // Add padding to make space for the CloseButton
+                      />
+                      {commentValue && (
                         <CloseButton
                           aria-label="Clear input"
                           onClick={() => setCommentValue("")}
                           style={{
-                            display: commentValue ? undefined : "none",
+                            position: "absolute",
+                            right: "5px",
+                            cursor: "pointer",
                           }}
                         />
-                      }
-                    />
+                      )}
+                    </div>
                     <Button
                       onClick={() => {
                         const objectComment = {
@@ -381,66 +495,10 @@ function EventApprovals({ clubName }) {
                     >
                       Submit
                     </Button>
+                    {renderRoleBasedActions}
                   </Group>
                 </Stack>
               </Box>
-
-              {(userRole === "FIC" ||
-                userRole === "Dean_s" ||
-                userRole === "Counsellor" ||
-                userRole === "Professor") && (
-                <Box mt="md">
-                  <Group>
-                    {(userRole === "FIC" || userRole === "Professor") && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleFICApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        FIC Approve
-                      </Button>
-                    )}
-
-                    {userRole === "Dean_s" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleDeanApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        Dean Approve
-                      </Button>
-                    )}
-                    {userRole === "Counsellor" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleCounsellorApproveButton(selectedEvent.id);
-                        }}
-                      >
-                        Counsellor Approve
-                      </Button>
-                    )}
-                    <Button
-                      color="red"
-                      onClick={() => {
-                        handleRejectButton(selectedEvent.id);
-                      }}
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      color="yellow"
-                      onClick={() => {
-                        handleModifyButton(selectedEvent.id);
-                      }}
-                    >
-                      Modify
-                    </Button>
-                  </Group>
-                </Box>
-              )}
             </Box>
           </Stack>
         )}
@@ -508,6 +566,5 @@ function EventApprovalsWithProviders({ clubName }) {
 EventApprovalsWithProviders.propTypes = {
   clubName: PropTypes.string,
 };
-
 
 export default EventApprovalsWithProviders;

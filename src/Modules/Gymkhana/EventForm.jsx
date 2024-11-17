@@ -109,7 +109,6 @@ function EventsApprovalForm({
           </Alert>
         )}
 
-
         {errorMessage && (
           <Alert title="Error" color="red" mt="md">
             {errorMessage}
@@ -203,7 +202,6 @@ function EventsApprovalForm({
             form.setFieldValue("end_time", event.currentTarget.value)
           }
           error={form.errors.end_time}
-
           disabled={editMode && disabledFields.includes("end_time")}
           withAsterisk
         />
@@ -230,7 +228,6 @@ function EventsApprovalForm({
         onClose={() => setIsModalOpen(false)}
         title="Success!"
       >
-
         <p>
           Your event has been successfully {editMode ? "updated" : "submitted"}!
         </p>
@@ -239,7 +236,6 @@ function EventsApprovalForm({
     </Container>
   );
 }
-
 
 EventsApprovalForm.propTypes = {
   clubName: PropTypes.string.isRequired,
@@ -261,7 +257,6 @@ function EventForm({ clubName }) {
 EventForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
-
 
 export { EventsApprovalForm };
 export default EventForm;

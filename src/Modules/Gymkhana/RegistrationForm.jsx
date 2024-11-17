@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-
 function ClubRegistrationForm({ clubName }) {
   const token = localStorage.getItem("authToken");
   // Set up the form with initial values and validation
