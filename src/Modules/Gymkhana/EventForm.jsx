@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "@mantine/form";
+import dayjs from "dayjs";
 import {
   TextInput,
   Button,
@@ -7,6 +8,7 @@ import {
   Container,
   Alert,
   Modal,
+  FileInput,
 } from "@mantine/core";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
@@ -65,20 +67,21 @@ function EventsApprovalForm({
         newEventData,
         {
           headers: {
+            "Content-Type": "multipart/form-data", // For file uploads
             Authorization: `Token ${token}`,
           },
         },
       );
     },
     onSuccess: (response) => {
-      console.log("Successfully registered:", response.data);
-      setSuccessMessage("Event registered successfully!");
+      console.log("Successfully requested:", response.data);
+      setSuccessMessage("Event request forwarded successfully!");
       setIsModalOpen(true);
       form.reset();
     },
     onError: (error) => {
-      console.error("Error during registration:", error);
-      setErrorMessage("Registration failed. Please try again.");
+      console.error("Error during forwarding request:", error);
+      setErrorMessage("Request failed. Please try again.");
     },
   });
 
@@ -91,10 +94,10 @@ function EventsApprovalForm({
     const formattedValues = {
       ...values,
       start_date: values.start_date
-        ? values.start_date.toISOString().slice(0, 10)
+        ? dayjs(values.start_date).format("YYYY-MM-DD")
         : null,
       end_date: values.end_date
-        ? values.end_date.toISOString().slice(0, 10)
+        ? dayjs(values.end_date).format("YYYY-MM-DD")
         : null,
     };
     mutation.mutate(formattedValues);
@@ -103,14 +106,15 @@ function EventsApprovalForm({
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
+        <h2 className="club-header">Apply for {clubName}'s Event !!!</h2>
         {successMessage && (
-          <Alert title="Success" color="green" mt="md">
+          <Alert title="Success" color="green" mt="md" className="club-message">
             {successMessage}
           </Alert>
         )}
 
         {errorMessage && (
-          <Alert title="Error" color="red" mt="md">
+          <Alert title="Error" color="red" mt="md" className="club-message">
             {errorMessage}
           </Alert>
         )}
@@ -205,19 +209,18 @@ function EventsApprovalForm({
           disabled={editMode && disabledFields.includes("end_time")}
           withAsterisk
         />
-        <TextInput
+        <FileInput
           label="Event Poster"
-          placeholder="Event Poster"
+          placeholder="Upload Event Poster"
           value={form.values.event_poster}
-          onChange={(event) =>
-            form.setFieldValue("event_poster", event.currentTarget.value)
-          }
+          onChange={(file) => form.setFieldValue("event_poster", file)}
           error={form.errors.event_poster}
-          disabled={editMode && disabledFields.includes("event_poster")}
+          // disabled={editMode && disabledFields.includes("event_poster")}
           withAsterisk
+          accept=".pdf"
         />
 
-        <Group position="center" mt="md">
+        <Group position="center" mt="md" className="submit-container">
           <Button type="submit" className="submit-btn">
             {editMode ? "Update" : "Submit"}
           </Button>
@@ -248,7 +251,6 @@ EventsApprovalForm.propTypes = {
 function EventForm({ clubName }) {
   return (
     <Container>
-      <h2 className="club-header">Apply for {clubName}'s Event !!!</h2>
       <EventsApprovalForm clubName={clubName} />
     </Container>
   );

@@ -70,7 +70,7 @@ function EventCalendar({ selectedDate, selectedClub, events }) {
                 >
                   <div
                     style={{
-                      backgroundColor: "black",
+                      backgroundColor: "#808080FF",
                       padding: "5px 10px",
                       margin: "5px 0",
                       color: "#fff",

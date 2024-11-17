@@ -69,6 +69,9 @@ function ClubRegistrationForm({ clubName }) {
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
+        <h2 className="club-header">
+          Hello from {clubName} - Enter your details for Registering !!!
+        </h2>
         {/* Name */}
         <TextInput
           label="Name"
@@ -114,7 +117,7 @@ function ClubRegistrationForm({ clubName }) {
         />
 
         {/* Submit Button */}
-        <Group position="center" mt="md">
+        <Group position="center" mt="md" className="submit-container">
           {token && (
             <Button type="submit" className="submit-btn">
               Submit
@@ -131,9 +134,6 @@ export { ClubRegistrationForm };
 function RegistrationForm({ clubName }) {
   return (
     <Container>
-      <h2 className="club-header">
-        Hello from {clubName} - Enter your details for Registering !!!
-      </h2>
       <ClubRegistrationForm clubName={clubName} />
     </Container>
   );

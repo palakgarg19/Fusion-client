@@ -16,7 +16,7 @@ import {
   ScrollArea,
   Pill,
 } from "@mantine/core";
-import { IconEye } from "@tabler/icons-react";
+import { IconEye, IconEdit, IconSend } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -29,18 +29,20 @@ import {
   approveDeanBudgetButton,
   rejectBudgetButton,
   modifyBudgetButton,
-} from "./BackendLogic/ApiRoutes"; // adjust the import path
+} from "./BackendLogic/ApiRoutes";
+
+import { BudgetApprovalForm } from "./BudgetForm";
 
 function BudgetApprovals({ clubName }) {
-  const token = localStorage.getItem("authToken");
   const user = useSelector((state) => state.user);
   const userRole = user.role;
+  const token = localStorage.getItem("authToken");
   const [selectedBudget, setSelectedBudget] = useState(null);
+  const [validationErrors] = useState({});
   const [commentValue, setCommentValue] = useState("");
-  const { data: commentsData } = useGetCommentsBudgetInfo(
-    selectedBudget?.id,
-    token,
-  );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: commentsData, refetch: refetchComments } =
+    useGetCommentsBudgetInfo(selectedBudget?.id, token);
 
   const columns = useMemo(
     () => [
@@ -61,7 +63,7 @@ function BudgetApprovals({ clubName }) {
         header: "Remarks",
       },
     ],
-    [],
+    [validationErrors],
   );
 
   const {
@@ -69,6 +71,7 @@ function BudgetApprovals({ clubName }) {
     isError: isLoadingBudgetsError,
     isFetching: isFetchingBudgets,
     isLoading: isLoadingBudgets,
+    refetch: refetchBudget,
   } = useGetUpcomingBudgets(token); // Fetch budgets for the club (implement the API call)
 
   const openViewModal = (budget) => {
@@ -79,56 +82,32 @@ function BudgetApprovals({ clubName }) {
     setSelectedBudget(null);
   };
 
-  const table = useMantineReactTable({
-    columns,
-    data: fetchedBudgets,
-    enableEditing: true,
-    getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingBudgetsError
-      ? {
-          color: "red",
-          children: "Error loading data",
-        }
-      : undefined,
-    renderRowActions: ({ row }) => (
-      <Flex gap="md">
-        <Tooltip label="View">
-          <ActionIcon onClick={() => openViewModal(row.original)}>
-            <IconEye />
-          </ActionIcon>
-        </Tooltip>
+  const openEditModal = (budget) => {
+    setSelectedBudget(budget);
+    setIsEditModalOpen(true);
+  };
 
-        <Pill
-          bg={
-            row.original.status === "ACCEPT"
-              ? "green"
-              : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
-          }
-        >
-          {row.original.status}
-        </Pill>
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedBudget(null);
+  };
 
-        {row.original.status === "COORDINATOR" &&
-          userRole === "co-ordinator" && (
-            <Tooltip label="Edit">
-              <ActionIcon
-                color="blue"
-                onClick={() => {
-                  // TODO: Implement Looooogic for this
-                }}
-              >
-                E
-              </ActionIcon>
-            </Tooltip>
-          )}
-      </Flex>
-    ),
-    state: {
-      isLoading: isLoadingBudgets,
-      showAlertBanner: isLoadingBudgetsError,
-      showProgressBars: isFetchingBudgets,
+  const updateBudgetMutation = useMutation({
+    mutationFn: (updatedBudgetData) => {
+      return axios.put(
+        "http://127.0.0.1:8000/gymkhana/api/update_budget/",
+        updatedBudgetData,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      closeEditModal();
+      refetchBudget();
+      // You might want to refresh your events data here
     },
   });
 
@@ -152,11 +131,14 @@ function BudgetApprovals({ clubName }) {
 
   const handleCommentSubmit = (values) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        alert("Comment posted successfully!");
+      onSuccess: (response) => {
+        console.log("Successfully comment posted!!!", response.data);
+        setCommentValue(""); // Clear the comment input field
+        refetchComments(); // Refresh the comments list
       },
-      onError: () => {
-        alert("Error posting comment");
+      onError: (error) => {
+        console.error("Error during posting comment", error);
+        alert("Error during posting comment");
       },
     });
   };
@@ -166,6 +148,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by FIC");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -174,6 +157,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Counsellor");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -182,6 +166,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Dean");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -190,6 +175,7 @@ function BudgetApprovals({ clubName }) {
     onSuccess: () => {
       alert("Rejected");
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -197,6 +183,7 @@ function BudgetApprovals({ clubName }) {
     mutationFn: (budgetId) => modifyBudgetButton(budgetId, token),
     onSuccess: () => {
       closeViewModal();
+      refetchBudget();
     },
   });
 
@@ -216,11 +203,64 @@ function BudgetApprovals({ clubName }) {
   const handleModifyButton = (budgetId) => {
     modifyMutation.mutate(budgetId);
   };
+  const table = useMantineReactTable({
+    columns,
+    data: fetchedBudgets,
+    enableEditing: true,
+    getRowId: (row) => row.id,
+    mantineToolbarAlertBannerProps: isLoadingBudgetsError
+      ? {
+          color: "red",
+          children: "Error loading data",
+        }
+      : undefined,
+    renderRowActions: ({ row }) => (
+      <Flex gap="md">
+        <Tooltip label="View">
+          <ActionIcon onClick={() => openViewModal(row.original)}>
+            <IconEye />
+          </ActionIcon>
+        </Tooltip>
+        {row.original.status === "COORDINATOR" &&
+          userRole === "co-ordinator" && (
+            <Tooltip label="Edit">
+              <ActionIcon
+                color="blue"
+                onClick={() => openEditModal(row.original)}
+              >
+                <IconEdit />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        <Pill
+          bg={
+            row.original.status === "ACCEPT"
+              ? "#B9FBC0"
+              : row.original.status === "REJECT"
+                ? "#FFA8A5"
+                : "#FFDB58"
+          }
+        >
+          {row.original.status}
+        </Pill>
+      </Flex>
+    ),
+    state: {
+      isLoading: isLoadingBudgets,
+      showAlertBanner: isLoadingBudgetsError,
+      showProgressBars: isFetchingBudgets,
+    },
+  });
 
   return (
     <>
       <MantineReactTable table={table} />
-      <Modal opened={!!selectedBudget} onClose={closeViewModal} w="40%">
+      {/* View Modal */}
+      <Modal
+        opened={!!selectedBudget && !isEditModalOpen}
+        onClose={closeViewModal}
+        w="40%"
+      >
         {selectedBudget && (
           <Stack
             spacing="md"
@@ -234,25 +274,20 @@ function BudgetApprovals({ clubName }) {
             }}
           >
             <Box>
-              <Stack spacing="xs">
+              <Stack>
                 <Text
-                  size="lg"
+                  size="25px"
                   style={{ fontWeight: 900 }}
                   align="center"
-                  mb="xs"
+                  mb="10px"
                 >
                   {selectedBudget.budget_for}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Amount Requested:
-                  </span>{" "}
-                  {selectedBudget.budget_amt}
+                <Text size="15px" weight={700}>
+                  <b>Amount Requested: </b> {selectedBudget.budget_amt}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Description:
-                  </span>{" "}
+                <Text size="15px" weight={700}>
+                  <b>Description: </b>
                   {selectedBudget.description}
                 </Text>
               </Stack>
@@ -261,71 +296,85 @@ function BudgetApprovals({ clubName }) {
 
               <Box>
                 <Stack>
-                  <Text size="md" weight={700}>
+                  <Text size="md" weight={500}>
                     Comments:
                   </Text>
-                  <ScrollArea h={250}>
+                  <ScrollArea
+                    h={300}
+                    styles={{
+                      viewport: {
+                        paddingRight: "10px", // Add padding to avoid overlap
+                      },
+                      scrollbar: {
+                        position: "absolute",
+                        right: 0,
+                        width: "8px",
+                      },
+                    }}
+                  >
                     {commentsData?.map((comment) => (
                       <Box
                         key={comment.event_index}
                         my="sm"
                         style={{
-                          border: "solid 2px black",
+                          border: " solid 1px lightgray",
                           borderRadius: "5px",
-                          padding: "2px",
                         }}
                       >
-                        <Pill weight={900} size="md" c="blue" mb="5px">
+                        <Pill weight={900} size="xs" c="blue" mb="5px">
                           {comment.commentator_designation}
                         </Pill>
-                        <Text size="sm" p="2px" radius="lg">
+                        <Text size="sm" p="10px" radius="lg">
                           {comment.comment}{" "}
                         </Text>
                         <Group justify="end">
-                          <Pill>{comment.comment_date}</Pill>
-                          <Pill>{comment.comment_time}</Pill>
+                          <Pill size="xs" mr="2px" mb="1px">
+                            {comment.comment_date}, {comment.comment_time}
+                          </Pill>
                         </Group>
                       </Box>
                     ))}
                   </ScrollArea>
 
-                  <Group position="apart" align="center">
-                    <Input
-                      placeholder="Add a comment"
-                      value={commentValue}
-                      onChange={(event) =>
-                        setCommentValue(event.currentTarget.value)
-                      }
-                      w="290px"
-                      rightSection={
-                        <CloseButton
-                          aria-label="Clear input"
-                          onClick={() => setCommentValue("")}
-                          style={{
-                            display: commentValue ? undefined : "none",
-                          }}
-                        />
-                      }
-                    />
-                    <Button
-                      onClick={() => {
-                        const objectComment = {
-                          userRole,
-                          commentValue,
-                          selectedBudget,
-                        };
-                        handleCommentSubmit(objectComment);
-                      }}
-                      color="blue"
-                    >
-                      Submit
-                    </Button>
+                  <Group position="apart" align="center" w="100%">
+                    <Flex align="center" gap="sm" style={{ flexGrow: 1 }}>
+                      <Input
+                        placeholder="Add a comment"
+                        value={commentValue}
+                        onChange={(event) =>
+                          setCommentValue(event.currentTarget.value)
+                        }
+                        w="100%"
+                        rightSection={
+                          <CloseButton
+                            aria-label="Clear input"
+                            onClick={() => setCommentValue("")}
+                            style={{
+                              display: commentValue ? undefined : "none",
+                            }}
+                          />
+                        }
+                      />
+                      <Button
+                        onClick={() => {
+                          const objectComment = {
+                            userRole,
+                            commentValue,
+                            selectedBudget,
+                          };
+                          handleCommentSubmit(objectComment);
+                        }}
+                        color="blue"
+                      >
+                        <IconSend />
+                      </Button>
+                    </Flex>
                   </Group>
                 </Stack>
               </Box>
 
               {(userRole === "FIC" ||
-                userRole === "Dean" ||
+                userRole === "Dean_s" ||
                 userRole === "Counsellor" ||
                 userRole === "Professor") && (
                 <Box mt="md">
@@ -340,7 +389,7 @@ function BudgetApprovals({ clubName }) {
                         FIC Approve
                       </Button>
                     )}
-                    {userRole === "Dean" && (
+                    {userRole === "Dean_s" && (
                       <Button
                         color="blue"
                         onClick={() => {
@@ -361,13 +410,13 @@ function BudgetApprovals({ clubName }) {
                       </Button>
                     )}
                     <Button
-                      color="red"
+                      color="blue"
                       onClick={() => handleRejectButton(selectedBudget.id)}
                     >
                       Reject
                     </Button>
                     <Button
-                      color="yellow"
+                      color="blue"
                       onClick={() => handleModifyButton(selectedBudget.id)}
                     >
                       Modify
@@ -379,17 +428,54 @@ function BudgetApprovals({ clubName }) {
           </Stack>
         )}
       </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        opened={isEditModalOpen}
+        onClose={closeEditModal}
+        title="Edit Budget"
+        size="lg"
+      >
+        {selectedBudget && (
+          <BudgetApprovalForm
+            clubName={clubName}
+            initialValues={{
+              ...selectedBudget,
+            }}
+            onSubmit={(values) => {
+              const formData = new FormData();
+
+              // Add the text data (details)
+              formData.append("budget_amt", values.budget_amt);
+
+              // Add the ID of the event
+              formData.append("id", selectedBudget.id);
+
+              // Now, submit the formData to the backend using the mutation
+              updateBudgetMutation.mutate(formData);
+            }}
+            editMode
+            disabledFields={[
+              "budget_for",
+              "budget_file",
+              "description",
+              "status",
+              "remarks",
+            ]}
+          />
+        )}
+      </Modal>
     </>
   );
 }
 
+BudgetApprovals.propTypes = {
+  clubName: PropTypes.string,
+};
 function BudgetApprovalsWithProviders({ clubName }) {
   return <BudgetApprovals clubName={clubName} />;
 }
 BudgetApprovalsWithProviders.propTypes = {
-  clubName: PropTypes.string,
-};
-BudgetApprovals.propTypes = {
   clubName: PropTypes.string,
 };
 

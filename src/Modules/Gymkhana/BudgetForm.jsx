@@ -6,6 +6,7 @@ import {
   Group,
   Container,
   Alert,
+  Modal,
   FileInput,
 } from "@mantine/core";
 import PropTypes from "prop-types";
@@ -13,18 +14,21 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "./GymkhanaForms.css";
 
-const token = localStorage.getItem("authToken");
-
-function BudgetApprovalForm({ clubName }) {
-  console.log(clubName);
-
-  // State for success and error messages
+function BudgetApprovalForm({
+  clubName,
+  initialValues,
+  onSubmit,
+  editMode = false,
+  disabledFields = [],
+}) {
+  const token = localStorage.getItem("authToken");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Set up the form with initial values and validation
   const form = useForm({
-    initialValues: {
+    initialValues: initialValues || {
       budget_for: "",
       description: "",
       budget_file: null, // For the file upload
@@ -53,18 +57,18 @@ function BudgetApprovalForm({ clubName }) {
   const mutation = useMutation({
     mutationFn: (newBudgetData) => {
       // Create a FormData object for file upload
-      const formData = new FormData();
-      formData.append("budget_for", newBudgetData.budget_for);
-      formData.append("description", newBudgetData.description);
-      formData.append("budget_amt", newBudgetData.budget_amt);
-      formData.append("status", newBudgetData.status);
-      formData.append("remarks", newBudgetData.remarks);
-      formData.append("club", newBudgetData.club);
-      formData.append("budget_file", newBudgetData.budget_file); // Attach the file
+      // const formData = new FormData();
+      // formData.append("budget_for", newBudgetData.budget_for);
+      // formData.append("description", newBudgetData.description);
+      // formData.append("budget_amt", newBudgetData.budget_amt);
+      // formData.append("status", newBudgetData.status);
+      // formData.append("remarks", newBudgetData.remarks);
+      // formData.append("club", newBudgetData.club);
+      // formData.append("budget_file", newBudgetData.budget_file); // Attach the file
 
       return axios.put(
         "http://127.0.0.1:8000/gymkhana/api/new_budget/", // API URL for the budget submission
-        formData,
+        newBudgetData,
         {
           headers: {
             "Content-Type": "multipart/form-data", // For file uploads
@@ -84,24 +88,30 @@ function BudgetApprovalForm({ clubName }) {
     },
   });
 
-  // Submit handler
   const handleSubmit = (values) => {
-    mutation.mutate(values);
+    if (editMode && onSubmit) {
+      onSubmit(values);
+      return;
+    }
+    const formattedValues = {
+      ...values,
+    };
+    mutation.mutate(formattedValues);
   };
-
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
+        <h2 className="club-header"> {clubName}'s Budget Proposal</h2>
         {/* Success Message */}
         {successMessage && (
-          <Alert title="Success" color="green" mt="md">
+          <Alert title="Success" color="green" mt="md" className="club-message">
             {successMessage}
           </Alert>
         )}
 
         {/* Error Message */}
         {errorMessage && (
-          <Alert title="Error" color="red" mt="md">
+          <Alert title="Error" color="red" mt="md" className="club-message">
             {errorMessage}
           </Alert>
         )}
@@ -115,6 +125,7 @@ function BudgetApprovalForm({ clubName }) {
             form.setFieldValue("budget_for", event.currentTarget.value)
           }
           error={form.errors.budget_for}
+          disabled={editMode && disabledFields.includes("budget_for")}
           withAsterisk
         />
 
@@ -127,6 +138,7 @@ function BudgetApprovalForm({ clubName }) {
             form.setFieldValue("description", event.currentTarget.value)
           }
           error={form.errors.description}
+          disabled={editMode && disabledFields.includes("description")}
           withAsterisk
         />
 
@@ -150,6 +162,7 @@ function BudgetApprovalForm({ clubName }) {
           placeholder="Upload your budget PDF"
           onChange={(file) => form.setFieldValue("budget_file", file)}
           error={form.errors.budget_file}
+          disabled={editMode && disabledFields.includes("budget_file")}
           accept=".pdf"
           withAsterisk
         />
@@ -163,6 +176,7 @@ function BudgetApprovalForm({ clubName }) {
             form.setFieldValue("status", event.currentTarget.value)
           }
           error={form.errors.status}
+          disabled={editMode && disabledFields.includes("status")}
           withAsterisk
         />
 
@@ -175,28 +189,44 @@ function BudgetApprovalForm({ clubName }) {
             form.setFieldValue("remarks", event.currentTarget.value)
           }
           error={form.errors.remarks}
+          disabled={editMode && disabledFields.includes("remarks")}
           withAsterisk
         />
 
         {/* Submit Button */}
-        <Group position="center" mt="md">
-          {token && (
-            <Button type="submit" className="submit-btn">
-              Submit
-            </Button>
-          )}
+
+        <Group position="center" mt="md" className="submit-container">
+          <Button type="submit" className="submit-btn">
+            {editMode ? "Update" : "Submit"}
+          </Button>
         </Group>
       </form>
+      <Modal
+        opened={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Success!"
+      >
+        <p>
+          Your budget has been successfully {editMode ? "updated" : "submitted"}
+          !
+        </p>
+        <Button onClick={() => setIsModalOpen(false)}>Close</Button>
+      </Modal>
     </Container>
   );
 }
 
-export { BudgetApprovalForm };
+BudgetApprovalForm.propTypes = {
+  clubName: PropTypes.string.isRequired,
+  initialValues: PropTypes,
+  onSubmit: PropTypes.func,
+  editMode: PropTypes.bool,
+  disabledFields: PropTypes.arrayOf(PropTypes.string),
+};
 
 function BudgetForm({ clubName }) {
   return (
     <Container>
-      <h2 className="club-header">Submit {clubName}'s Budget Proposal</h2>
       <BudgetApprovalForm clubName={clubName} />
     </Container>
   );
@@ -206,4 +236,5 @@ BudgetForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
 
+export { BudgetApprovalForm };
 export default BudgetForm;

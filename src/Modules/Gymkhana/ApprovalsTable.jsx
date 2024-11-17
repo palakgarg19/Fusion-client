@@ -19,7 +19,7 @@ import {
   Pill,
   ScrollArea,
 } from "@mantine/core";
-import { IconEye, IconEdit } from "@tabler/icons-react";
+import { IconEye, IconEdit, IconSend } from "@tabler/icons-react";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -44,10 +44,8 @@ function EventApprovals({ clubName }) {
   const [validationErrors] = useState({});
   const [commentValue, setCommentValue] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { data: commentsData } = useGetCommentsEventInfo(
-    selectedEvent?.id,
-    token,
-  );
+  const { data: commentsData, refetch: refetchComments } =
+    useGetCommentsEventInfo(selectedEvent?.id, token);
 
   const columns = useMemo(
     () => [
@@ -72,7 +70,9 @@ function EventApprovals({ clubName }) {
     isError: isLoadingEventsError,
     isFetching: isFetchingEvents,
     isLoading: isLoadingEvents,
+    refetch: refetchEvents,
   } = useGetUpcomingEvents(token);
+
 
   const filteredEvents = useMemo(() => {
     return fetchedEvents.filter((event) => {
@@ -117,6 +117,7 @@ function EventApprovals({ clubName }) {
     });
   }, [fetchedEvents, userRole]);
 
+
   const openViewModal = (event) => {
     setSelectedEvent(event);
   };
@@ -149,6 +150,7 @@ function EventApprovals({ clubName }) {
     },
     onSuccess: () => {
       closeEditModal();
+      refetchEvents();
       // You might want to refresh your events data here
     },
   });
@@ -175,7 +177,9 @@ function EventApprovals({ clubName }) {
     mutation.mutate(values, {
       onSuccess: (response) => {
         console.log("Successfully comment posted!!!", response.data);
-        alert("Successfully comment posted!!!");
+        setCommentValue(""); // Clear the comment input field
+        refetchComments(); // Refresh the comments list
+        // alert("Successfully comment posted!!!");
       },
       onError: (error) => {
         console.error("Error during posting comment", error);
@@ -191,6 +195,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by FIC");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -199,6 +204,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Counsellor");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -207,6 +213,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Approved by Dean Student");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -215,6 +222,7 @@ function EventApprovals({ clubName }) {
     onSuccess: () => {
       alert("Rejected the event");
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -222,6 +230,7 @@ function EventApprovals({ clubName }) {
     mutationFn: (eventId) => modifyEventButton(eventId, token),
     onSuccess: () => {
       closeViewModal();
+      refetchEvents();
     },
   });
 
@@ -337,19 +346,6 @@ function EventApprovals({ clubName }) {
             <IconEye />
           </ActionIcon>
         </Tooltip>
-
-        <Pill
-          bg={
-            row.original.status === "ACCEPT"
-              ? "green"
-              : row.original.status === "REJECT"
-                ? "red"
-                : "yellow"
-          }
-        >
-          {row.original.status}
-        </Pill>
-
         {row.original.status === "COORDINATOR" &&
           userRole === "co-ordinator" && (
             <Tooltip label="Edit">
@@ -361,6 +357,17 @@ function EventApprovals({ clubName }) {
               </ActionIcon>
             </Tooltip>
           )}
+        <Pill
+          bg={
+            row.original.status === "ACCEPT"
+              ? "#B9FBC0"
+              : row.original.status === "REJECT"
+                ? "#FFA8A5"
+                : "#FFDB58"
+          }
+        >
+          {row.original.status}
+        </Pill>
       </Flex>
     ),
     state: {
@@ -393,32 +400,29 @@ function EventApprovals({ clubName }) {
             }}
           >
             <Box>
-              <Stack spacing="xs">
+              <Stack>
                 <Text
-                  size="lg"
+                  size="25px"
                   style={{ fontWeight: 900 }}
                   align="center"
-                  mb="xs"
+                  mb="10px"
                 >
                   {selectedEvent.event_name}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Date Range:
-                  </span>
-                  {selectedEvent.start_date} - {selectedEvent.end_date}
+                <Text size="15px" weight={700}>
+                  <b>Date:</b> {selectedEvent.start_date} to{" "}
+                  {selectedEvent.end_date}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Venue:
-                  </span>
+                <Text size="15px" weight={700}>
+                  <b>Time:</b> {selectedEvent.start_time} to{" "}
+                  {selectedEvent.end_time}
+                </Text>
+                <Text size="15px" weight={700}>
+                  <b>Venue: </b>
                   {selectedEvent.venue}
                 </Text>
-                <Text size="sm" weight={700}>
-                  <span style={{ fontWeight: 900, fontSize: "16px" }}>
-                    Description:
-                  </span>{" "}
-                  {selectedEvent.details}
+                <Text size="15px" weight={700}>
+                  <b>Description: </b> {selectedEvent.details}
                 </Text>
               </Stack>
 
@@ -426,33 +430,46 @@ function EventApprovals({ clubName }) {
 
               <Box>
                 <Stack>
-                  <Text size="md" weight={700}>
+                  <Text size="md" weight={500}>
                     Comments:
                   </Text>
-                  <ScrollArea h={250}>
+                  <ScrollArea
+                    h={300}
+                    styles={{
+                      viewport: {
+                        paddingRight: "10px", // Add padding to avoid overlap
+                      },
+                      scrollbar: {
+                        position: "absolute",
+                        right: 0,
+                        width: "8px",
+                      },
+                    }}
+                  >
                     {commentsData?.map((comment) => (
                       <Box
                         key={comment.comment}
                         my="sm"
                         style={{
-                          border: "solid 2px black",
+                          border: " solid 1px lightgray",
                           borderRadius: "5px",
-                          padding: "2px",
                         }}
                       >
-                        <Pill weight={900} size="md" c="blue" mb="5px">
+                        <Pill weight={900} size="xs" c="blue" ml="5px">
                           {comment.commentator_designation}
                         </Pill>
-                        <Text size="sm" p="2px" radius="lg">
+                        <Text size="sm" pl="10px" radius="lg">
                           {comment.comment}{" "}
                         </Text>
                         <Group justify="end">
-                          <Pill>{comment.comment_date}</Pill>
-                          <Pill>{comment.comment_time}</Pill>
+                          <Pill size="xs" mr="2px" mb="1px">
+                            {comment.comment_date}, {comment.comment_time}
+                          </Pill>
                         </Group>
                       </Box>
                     ))}
                   </ScrollArea>
+
 
                   <Group position="apart" align="center">
                     <div
@@ -462,6 +479,7 @@ function EventApprovals({ clubName }) {
                         alignItems: "center",
                       }}
                     >
+
                       <Input
                         placeholder="Add a comment"
                         value={commentValue}

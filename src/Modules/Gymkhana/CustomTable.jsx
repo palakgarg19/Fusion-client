@@ -9,7 +9,7 @@ import {
   useMantineReactTable,
   MRT_TableBodyCellValue,
 } from "mantine-react-table";
-import { Divider, Flex, Stack, Table, Title } from "@mantine/core";
+import { Divider, Flex, Stack, Table, Title, Paper } from "@mantine/core";
 import PropTypes from "prop-types";
 
 // function CustomTable({ data, columns, TableName }) {
@@ -115,65 +115,67 @@ function CustomTable({ data, columns, TableName }) {
   });
 
   return (
-    <Stack style={{ width: "100%" }}>
-      <Divider />
-      <Title order={4}>{TableName} Table</Title>
-      <Flex justify="space-between" align="center">
-        {/* eslint-disable-next-line react/jsx-pascal-case */}
-        <MRT_GlobalFilterTextInput table={table} />
-        {/* eslint-disable-next-line react/jsx-pascal-case */}
-        <MRT_TablePagination table={table} />
-      </Flex>
+    <Paper withBorder shadow="sm" p="md" style={{ backgroundColor: "white" }}>
+      <Stack style={{ width: "100%" }}>
+        <Divider />
+        <Title order={4}>{TableName} Table</Title>
+        <Flex justify="space-between" align="center">
+          {/* eslint-disable-next-line react/jsx-pascal-case */}
+          <MRT_GlobalFilterTextInput table={table} />
+          {/* eslint-disable-next-line react/jsx-pascal-case */}
+          <MRT_TablePagination table={table} />
+        </Flex>
 
-      <div style={{ width: "100%" }}>
-        <Table
-          captionSide="top"
-          fz="md"
-          highlightOnHover
-          horizontalSpacing="xs"
-          striped
-          verticalSpacing="xs"
-          withTableBorder
-          withColumnBorders // Make table span the full width
-        >
-          <Table.Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Th
-                    key={header.id}
-                    // Minimum width for each header
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.Header ??
-                            header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-          <Table.Tbody>
-            {table.getRowModel().rows.map((row) => (
-              <Table.Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Table.Td key={cell.id}>
-                    {/* eslint-disable-next-line react/jsx-pascal-case */}
-                    <MRT_TableBodyCellValue cell={cell} table={table} />
-                  </Table.Td>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </div>
+        <div style={{ width: "100%" }}>
+          <Table
+            captionSide="top"
+            fz="md"
+            highlightOnHover
+            horizontalSpacing="xs"
+            striped
+            verticalSpacing="xs"
+            withTableBorder
+            withColumnBorders // Make table span the full width
+          >
+            <Table.Thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Table.Th
+                      key={header.id}
+                      // Minimum width for each header
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.Header ??
+                              header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </Table.Th>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Thead>
+            <Table.Tbody>
+              {table.getRowModel().rows.map((row) => (
+                <Table.Tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <Table.Td key={cell.id}>
+                      {/* eslint-disable-next-line react/jsx-pascal-case */}
+                      <MRT_TableBodyCellValue cell={cell} table={table} />
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </div>
 
-      {/* eslint-disable-next-line react/jsx-pascal-case */}
-      <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-    </Stack>
+        {/* eslint-disable-next-line react/jsx-pascal-case */}
+        <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+      </Stack>
+    </Paper>
   );
 }
 
