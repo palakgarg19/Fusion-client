@@ -6,7 +6,6 @@ function EventCard({ events }) {
   if (!events || events.length === 0) {
     return <Text>No events for the selected date.</Text>;
   }
-  console.log(events);
   return (
     <div>
       {events.map((event, index) => (

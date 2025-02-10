@@ -181,9 +181,7 @@ function ClubViewComponent({
           setActiveTab={setactiveclubfeature}
         />
       </Group>
-      <Box h="80vh" mt="20px">
-        {renderActiveContent()}
-      </Box>
+      <Box mt="20px">{renderActiveContent()}</Box>
     </Box>
   );
 }

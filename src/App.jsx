@@ -1,4 +1,4 @@
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, createTheme } from "@mantine/core";
 import { Suspense, lazy } from "react";
 import "@mantine/core/styles.css";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
@@ -14,10 +14,21 @@ import ValidateAuth from "./helper/validateauth";
 const GymkhanaDashboard = lazy(
   () => import("./Modules/Gymkhana/GymkhanaDashboard.jsx"),
 );
+
+const theme = createTheme({
+  breakpoints: {
+    xs: "30em",
+    sm: "48em",
+    md: "64em",
+    lg: "74em",
+    xl: "90em",
+  },
+});
+
 export default function App() {
   const location = useLocation();
   return (
-    <MantineProvider>
+    <MantineProvider theme={theme}>
       <Notifications
         position="top-right"
         zIndex={1000}

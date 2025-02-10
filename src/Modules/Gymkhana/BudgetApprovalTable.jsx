@@ -74,6 +74,52 @@ function BudgetApprovals({ clubName }) {
     refetch: refetchBudget,
   } = useGetUpcomingBudgets(token); // Fetch budgets for the club (implement the API call)
 
+  const filteredBudgets = useMemo(() => {
+    return fetchedBudgets.filter((budget) => {
+      if (
+        (budget.status.toLowerCase() === "coordinator" ||
+          budget.status.toLowerCase() === "reject") &&
+        userRole.toLowerCase() === "co-ordinator"
+      ) {
+        return true;
+      }
+      if (budget.status.toLowerCase() === "fic") {
+        if (
+          userRole.toLowerCase() === "co-ordinator" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor"
+        ) {
+          return true;
+        }
+      }
+      if (budget.status.toLowerCase() === "counsellor") {
+        if (
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      if (
+        budget.status.toLowerCase() === "dean" ||
+        budget.status.toLowerCase() === "accept"
+      ) {
+        if (
+          userRole.toLowerCase() === "dean_s" ||
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }, [fetchedBudgets, userRole]);
+
   const openViewModal = (budget) => {
     setSelectedBudget(budget);
   };
@@ -203,9 +249,84 @@ function BudgetApprovals({ clubName }) {
   const handleModifyButton = (budgetId) => {
     modifyMutation.mutate(budgetId);
   };
+  const renderRoleBasedActions = useMemo(() => {
+    if (!selectedBudget) return null;
+
+    if (
+      selectedBudget.status === "FIC" &&
+      (userRole === "Professor" || userRole === "Assistant Professor")
+    ) {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleFICApproveButton(selectedBudget.id)}
+          >
+            FIC Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedBudget.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedBudget.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedBudget.status === "COUNSELLOR" && userRole === "Counsellor") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleCounsellorApproveButton(selectedBudget.id)}
+          >
+            Counsellor Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedBudget.id)}
+          >
+            Reject
+          </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleModifyButton(selectedBudget.id)}
+          >
+            Modify
+          </Button>
+        </>
+      );
+    }
+    if (selectedBudget.status === "DEAN" && userRole === "Dean_s") {
+      return (
+        <>
+          <Button
+            color="blue"
+            onClick={() => handleDeanApproveButton(selectedBudget.id)}
+          >
+            Final Approve
+          </Button>
+          <Button
+            color="red"
+            onClick={() => handleRejectButton(selectedBudget.id)}
+          >
+            Reject
+          </Button>
+        </>
+      );
+    }
+
+    return null;
+  }, [selectedBudget, userRole]);
   const table = useMantineReactTable({
     columns,
-    data: fetchedBudgets,
+    data: filteredBudgets,
     enableEditing: true,
     getRowId: (row) => row.id,
     mantineToolbarAlertBannerProps: isLoadingBudgetsError
@@ -336,94 +457,52 @@ function BudgetApprovals({ clubName }) {
                     ))}
                   </ScrollArea>
 
-                  <Group position="apart" align="center" w="100%">
-                    <Flex align="center" gap="sm" style={{ flexGrow: 1 }}>
+                  <Group position="apart" align="center">
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <Input
                         placeholder="Add a comment"
                         value={commentValue}
-                        onChange={(event) =>
-                          setCommentValue(event.currentTarget.value)
+                        onChange={(budget) =>
+                          setCommentValue(budget.currentTarget.value)
                         }
-                        w="100%"
-                        rightSection={
-                          <CloseButton
-                            aria-label="Clear input"
-                            onClick={() => setCommentValue("")}
-                            style={{
-                              display: commentValue ? undefined : "none",
-                            }}
-                          />
-                        }
+                        style={{ paddingRight: "30px", width: "290px" }} // Add padding to make space for the CloseButton
                       />
-                      <Button
-                        onClick={() => {
-                          const objectComment = {
-                            userRole,
-                            commentValue,
-                            selectedBudget,
-                          };
-                          handleCommentSubmit(objectComment);
-                        }}
-                        color="blue"
-                      >
-                        <IconSend />
-                      </Button>
-                    </Flex>
+                      {commentValue && (
+                        <CloseButton
+                          aria-label="Clear input"
+                          onClick={() => setCommentValue("")}
+                          style={{
+                            position: "absolute",
+                            right: "5px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const objectComment = {
+                          userRole,
+                          commentValue,
+                          selectedBudget,
+                        };
+                        handleCommentSubmit(objectComment);
+                      }}
+                      color="blue"
+                    >
+                      <IconSend />
+                    </Button>
+                    {/* </Flex> */}
+                    {renderRoleBasedActions}
                   </Group>
                 </Stack>
               </Box>
-
-              {(userRole === "FIC" ||
-                userRole === "Dean_s" ||
-                userRole === "Counsellor" ||
-                userRole === "Professor") && (
-                <Box mt="md">
-                  <Group justify="center">
-                    {(userRole === "FIC" || userRole === "Professor") && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleFICApproveButton(selectedBudget.id);
-                        }}
-                      >
-                        FIC Approve
-                      </Button>
-                    )}
-                    {userRole === "Dean_s" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleDeanApproveButton(selectedBudget.id);
-                        }}
-                      >
-                        Dean Approve
-                      </Button>
-                    )}
-                    {userRole === "Counsellor" && (
-                      <Button
-                        color="blue"
-                        onClick={() => {
-                          handleCounsellorApproveButton(selectedBudget.id);
-                        }}
-                      >
-                        Counsellor Approve
-                      </Button>
-                    )}
-                    <Button
-                      color="blue"
-                      onClick={() => handleRejectButton(selectedBudget.id)}
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      color="blue"
-                      onClick={() => handleModifyButton(selectedBudget.id)}
-                    >
-                      Modify
-                    </Button>
-                  </Group>
-                </Box>
-              )}
             </Box>
           </Stack>
         )}
@@ -447,6 +526,8 @@ function BudgetApprovals({ clubName }) {
 
               // Add the text data (details)
               formData.append("budget_amt", values.budget_amt);
+              formData.append("budget_file", values.budget_file);
+              formData.append("remarks", values.remarks);
 
               // Add the ID of the event
               formData.append("id", selectedBudget.id);
@@ -457,10 +538,10 @@ function BudgetApprovals({ clubName }) {
             editMode
             disabledFields={[
               "budget_for",
-              "budget_file",
+              // "budget_file",
               "description",
               "status",
-              "remarks",
+              // "remarks",
             ]}
           />
         )}

@@ -1,7 +1,8 @@
 import { useState, Suspense, lazy, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Container, Paper, Select, Group, Text } from "@mantine/core";
+import { Box, Paper, Select, Group, Text } from "@mantine/core";
 import dayjs from "dayjs";
+import { useMediaQuery } from "@mantine/hooks";
 import ModuleTabs from "../../components/moduleTabs";
 import { setActiveTab_ } from "../../redux/moduleslice";
 
@@ -24,6 +25,7 @@ const CustomTable = lazy(() => import("./CustomTable"));
 
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
+  const isMobile = useMediaQuery(`(max-width: 750px)`);
   const token = localStorage.getItem("authToken");
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("0");
@@ -44,7 +46,10 @@ function GymkhanaDashboard() {
     value,
     token,
   );
-  const { refetch: refetchClubDetail } = useGetData(value, token);
+  const { data: clubDetails, refetch: refetchClubDetail } = useGetData(
+    value,
+    token,
+  );
   const { data: Acheivements, refetch: refetchAcheivements } =
     useGetClubAcheivement(value, token);
   // Use useEffect to refetch data when `value` (selected club) changes
@@ -58,9 +63,6 @@ function GymkhanaDashboard() {
 
   return (
     <>
-      <div>
-        {user.username}s Gymkanaha dashboard , role is {user.role}
-      </div>{" "}
       <ModuleTabs
         tabs={tabs}
         activeTab={activeTab}
@@ -71,7 +73,13 @@ function GymkhanaDashboard() {
         badges={badges}
       />
       {activeTab === "0" && (
-        <Box mt="30px" mx="30px" px="30px" mb="xs" w="90vw">
+        <Box
+          mt={{ base: "5px", sm: "30px" }}
+          mx={{ base: "5px", sm: "30px" }}
+          px={{ base: "5px", sm: "30px" }}
+          mb={{ base: "xs", sm: "30px" }}
+          w="90vw"
+        >
           <Group justify="end" mb="5px" mr="110px">
             <Select
               data={["BitByte", "AFC"]}
@@ -82,11 +90,20 @@ function GymkhanaDashboard() {
             />
           </Group>
           {value === "Select a Club" ? (
-            <Paper shadow="md" p="xl" h="80vh" w="80vw" ml="20px">
+            <Paper
+              shadow="md"
+              p="xl"
+              h="80vh"
+              w="80vw"
+              ml="20px"
+              style={{
+                overflow: "scroll",
+              }}
+            >
               {/* Club Information Content */}
-              <Container>
+              <Box w="70vw">
                 <h4>Brief Information regarding Clubs...</h4>
-                <Text mt="5px">
+                <Text mt="5px" size={isMobile ? "sm" : "md"}>
                   <span style={{ fontWeight: 900 }}>Clubs Cultural Club:</span>
                   The Institute has vibrant Cultural Clubs that provide a
                   platform for students to showcase their creativity and talent.
@@ -101,7 +118,7 @@ function GymkhanaDashboard() {
                   helping students in honing their talent and skills, they
                   organize their respective annual festivals.
                 </Text>
-                <Text mt="5px">
+                <Text mt="5px" size={isMobile ? "sm" : "md"}>
                   <span style={{ fontWeight: 900 }}>
                     Science & Technology Club
                   </span>
@@ -114,7 +131,7 @@ function GymkhanaDashboard() {
                   Business and Management, Fabrication and Astronomy related
                   events are organized throughout the year.
                 </Text>
-                <Text mt="5px">
+                <Text mt="5px" size={isMobile ? "sm" : "md"}>
                   <span style={{ fontWeight: 900 }}>Sports Club:</span>Sports
                   and games play a major role in keeping a person fit and fine.
                   Sports in general inculcates, team work, mental strength and
@@ -136,7 +153,7 @@ function GymkhanaDashboard() {
                   participation in inter-collegiate, inter-IIIT and other open
                   tournaments across the country.
                 </Text>
-              </Container>
+              </Box>
             </Paper>
           ) : (
             <Suspense fallback={<div>Loading .......</div>}>
@@ -146,11 +163,6 @@ function GymkhanaDashboard() {
                   clubName={value}
                   membersData={clubMembers}
                   achievementsData={Acheivements}
-                  eventsData={upcomingEvents.filter((item) => {
-                    if (item.club === value && item.status === "ACCEPT")
-                      return true;
-                    return false;
-                  })}
                   eventsData={[...upcomingEvents, ...pastEvents]
                     .filter((item) => {
                       if (item.club === value && item.status === "ACCEPT")
@@ -232,19 +244,19 @@ function GymkhanaDashboard() {
         </Box>
       )}
       {activeTab === "1" && (
-        <Container>
+        <Box>
           {pastEvents && upcomingEvents && (
-            <Container
+            <Box
               style={{
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: isMobile ? "column" : "row",
                 height: "100%",
                 justifyContent: "center",
                 gap: "10px",
               }}
             >
               {/* Left Section */}
-              <Container
+              <Box
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -259,14 +271,19 @@ function GymkhanaDashboard() {
                   setSelectedDate={setSelectedDate}
                 />
                 <EventCard
-                  events={[...pastEvents, ...upcomingEvents].filter((event) =>
-                    dayjs(event.start_date).isSame(selectedDate, "day"),
-                  )}
+                  events={[...pastEvents, ...upcomingEvents]
+                    .filter((event) =>
+                      dayjs(event.start_date).isSame(selectedDate, "day"),
+                    )
+                    .filter((event) => {
+                      if (event.status === "ACCEPT") return true;
+                      return false;
+                    })}
                 />
-              </Container>
+              </Box>
 
               {/* Right Section */}
-              <Container
+              <Box
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -292,12 +309,15 @@ function GymkhanaDashboard() {
                 <EventCalendar
                   selectedDate={selectedDate}
                   selectedClub={selectedClub}
-                  events={[...pastEvents, ...upcomingEvents]}
+                  events={[...pastEvents, ...upcomingEvents].filter((event) => {
+                    if (event.status === "ACCEPT") return true;
+                    return false;
+                  })}
                 />
-              </Container>
-            </Container>
+              </Box>
+            </Box>
           )}
-        </Container>
+        </Box>
       )}
       {activeTab === "2" && (
         <Box mt="10px" mx="0" my="xs">
@@ -347,7 +367,6 @@ function GymkhanaDashboard() {
                   TableName="Upcoming Events"
                 />
               )}
-
             </Suspense>
           </Box>
           <Box>
@@ -386,8 +405,6 @@ function GymkhanaDashboard() {
               )}
             </Suspense>
           </Box>
-
-         
         </Box>
       )}
     </>

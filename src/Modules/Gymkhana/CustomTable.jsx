@@ -9,6 +9,7 @@ import {
   useMantineReactTable,
   MRT_TableBodyCellValue,
 } from "mantine-react-table";
+import { useMediaQuery } from "@mantine/hooks";
 import { Divider, Flex, Stack, Table, Title, Paper } from "@mantine/core";
 import PropTypes from "prop-types";
 
@@ -108,25 +109,29 @@ function CustomTable({ data, columns, TableName }) {
       rowsPerPageOptions: ["5", "10", "15"],
     },
     paginationDisplayMode: "pages",
+    size: 20,
     mantineTableBodyCellProps: {
       width: "20px",
+      cellPadding: "5px",
     },
     enableStickyHeader: true,
   });
-
+  const isMobile = useMediaQuery(`(max-width: 750px)`);
   return (
     <Paper withBorder shadow="sm" p="md" style={{ backgroundColor: "white" }}>
       <Stack style={{ width: "100%" }}>
         <Divider />
-        <Title order={4}>{TableName} Table</Title>
+        <Title order={2} align="center" c="blue" className="club-header">
+          {TableName} Table
+        </Title>
         <Flex justify="space-between" align="center">
           {/* eslint-disable-next-line react/jsx-pascal-case */}
-          <MRT_GlobalFilterTextInput table={table} />
+          <MRT_GlobalFilterTextInput table={table} visibleFrom="md" />
           {/* eslint-disable-next-line react/jsx-pascal-case */}
-          <MRT_TablePagination table={table} />
+          <MRT_TablePagination table={table} size="md" />
         </Flex>
 
-        <div style={{ width: "100%" }}>
+        <div style={{ width: "100%", overflow: "scroll" }}>
           <Table
             captionSide="top"
             fz="md"

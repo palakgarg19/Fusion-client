@@ -15,6 +15,7 @@ import {
   Button,
   Select,
   Paper,
+  Box,
 } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
@@ -79,21 +80,25 @@ function Header({ opened, toggleSidebar }) {
   };
 
   return (
-    <Paper
+    <Box
       bg="#F5F7F8"
-      justify={{ base: "space-between" }}
+      justify="space-between"
       align="center"
       pl="sm"
       h="64px" // Height has already been set in layout.jsx but had to set the height here as well for properly aligning the avatar
     >
-      <Burger
-        opened={opened}
-        onClick={toggleSidebar}
-        hiddenFrom="sm"
-        size="sm"
-      />
-      <Flex justify="space-between" align="center" h="100%">
-        <Text fz="h2">FUSION - IIITDMJ's ERP Portal</Text>
+      <Flex justify={{ base: "space-between" }} align="center" h="100%">
+        <Box>
+          <Burger
+            opened={opened}
+            onClick={toggleSidebar}
+            hiddenFrom="sm"
+            size="sm"
+          />
+        </Box>
+        <Text fz="h2" visibleFrom="md">
+          FUSION - IIITDMJ's ERP Portal
+        </Text>
         <Flex
           justify="flex-end"
           align="center"
@@ -111,8 +116,6 @@ function Header({ opened, toggleSidebar }) {
             value={role}
             onChange={handleRoleChange}
             placeholder="Role"
-            mr="64px"
-            size="md"
           />
           <Indicator>
             <Bell color="orange" size="32px" cursor="pointer" />
@@ -176,7 +179,7 @@ function Header({ opened, toggleSidebar }) {
           </Popover>
         </Flex>
       </Flex>
-    </Paper>
+    </Box>
   );
 }
 

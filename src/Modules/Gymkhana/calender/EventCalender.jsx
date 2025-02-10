@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Tooltip } from "@mantine/core";
 import dayjs from "dayjs";
+import { useMediaQuery } from "@mantine/hooks";
 import PropTypes from "prop-types";
 
 function EventCalendar({ selectedDate, selectedClub, events }) {
@@ -26,7 +27,7 @@ function EventCalendar({ selectedDate, selectedClub, events }) {
 
     setDaysInMonth(daysArray);
   }, [selectedDate]);
-
+  const isMobile = useMediaQuery(`(max-width: 750px)`);
   return (
     <div
       style={{
@@ -40,9 +41,9 @@ function EventCalendar({ selectedDate, selectedClub, events }) {
           key={index}
           style={{
             border: "1px solid #ddd",
-            padding: "10px",
-            minHeight: "110px", // Increase height
-            minWidth: "110px", // Increase width
+            padding: isMobile ? "2px" : "10px",
+            minHeight: isMobile ? "25px" : "110px", // Increase height
+            minWidth: isMobile ? "25px" : "110px", // Increase width
             backgroundColor: "white", // Set background color to white
             borderRadius: "5px",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)", // Optional: add shadow for better visibility
@@ -75,7 +76,7 @@ function EventCalendar({ selectedDate, selectedClub, events }) {
                       margin: "5px 0",
                       color: "#fff",
                       borderRadius: "3px",
-                      fontSize: "14px", // Font size for event card
+                      fontSize: isMobile ? "1px" : "14px", // Font size for event card
                     }}
                   >
                     {event.start_time} {event.event_name}
