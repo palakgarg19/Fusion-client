@@ -354,3 +354,25 @@ export const useGetCurrentLoginnedRoleRelatedClub = (InputName, token) => {
     },
   });
 };
+export const useGetFests = (token) => {
+  return useQuery({
+    queryKey: ["FestsData"],
+    queryFn: async () => {
+      try {
+        const { data } = await axios.get(
+          "http://localhost:8000/gymkhana/fest/",
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          },
+        );
+        // console.log("fetched data",data);
+        return data;
+      } catch (error) {
+        console.error("Error:", error.response?.data || error.message);
+        throw new Error("Failed to fetch data");
+      }
+    },
+  });
+};
