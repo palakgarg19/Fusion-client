@@ -1,5 +1,6 @@
 import { MantineProvider, createTheme } from "@mantine/core";
 import { Suspense, lazy } from "react";
+import { useSelector } from "react-redux";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
@@ -9,6 +10,9 @@ import { Layout } from "./components/layout";
 // import { IwdRoutes } from "./Modules/Iwd/routes/index";
 import IwdModule from "./Modules/Iwd/index";
 import { DesignationsProvider } from "./Modules/Iwd/helper/designationContext";
+// eslint-disable-next-line import/no-unresolved
+import ConvenorBreadcumbs from "./Modules/Scholarship/convenor/components/ConvenorBreadcumbs";
+import UserBreadcrumbs from "./Modules/Scholarship/user/components/UserBreadcumbs";
 
 const Dashboard = lazy(
   () => import("./Modules/Dashboard/dashboardNotifications"),
@@ -55,6 +59,7 @@ const FacultyProfessionalProfile = lazy(
   () =>
     import("./Modules/facultyProfessionalProfile/facultyProfessionalProfile"),
 );
+
 const InactivityHandler = lazy(() => import("./helper/inactivityhandler"));
 const DepartmentPage = lazy(
   () => import("./Modules/Department/DepartmentDashboard"),
@@ -70,6 +75,7 @@ const theme = createTheme({
 
 export default function App() {
   const location = useLocation();
+  const role = useSelector((state) => state.user.role);
   return (
     <MantineProvider theme={theme}>
       <Notifications position="top-center" autoClose={2000} limit={1} />
@@ -407,6 +413,19 @@ export default function App() {
             </Layout>
           }
         />
+
+        {/* scholarship */}
+        <Route
+          path="/scholarship"
+          element={
+            <Layout>
+              {role === "spacsconvenor" && <ConvenorBreadcumbs />}
+              {role === "student" && <UserBreadcrumbs />}
+              {role === "spacsassistant" && <ConvenorBreadcumbs />}
+            </Layout>
+          }
+        />
+
         <Route path="/accounts/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ForgotPassword />} />
         <Route
