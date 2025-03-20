@@ -10,7 +10,7 @@ import ClubFilter from "./calender/ClubFilter";
 import DateSelector from "./calender/DateSelector";
 import EventCalendar from "./calender/EventCalender";
 import EventCard from "./calender/EventCard";
-// import CustomTable from "./CustomTable";
+
 import { festColumns, festData } from "./makeData";
 import {
   useGetClubMembers,
@@ -21,8 +21,8 @@ import {
   useGetFests,
 } from "./BackendLogic/ApiRoutes";
 
-const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
 const CustomTable = lazy(() => import("./CustomTable"));
+const ClubViewComponent = lazy(() => import("./ClubViewComponent"));
 
 function GymkhanaDashboard() {
   const user = useSelector((state) => state.user);
@@ -98,9 +98,7 @@ function GymkhanaDashboard() {
               h="80vh"
               w="80vw"
               ml="20px"
-              style={{
-                overflow: "scroll",
-              }}
+              style={{ overflow: "scroll" }}
             >
               {/* Club Information Content */}
               <Box w="70vw">
@@ -177,45 +175,21 @@ function GymkhanaDashboard() {
                       accessorKey: "club", // Key in your data object
                       header: "Club", // Column header name
                     },
-                    {
-                      accessorKey: "description",
-                      header: "Description",
-                    },
+                    { accessorKey: "description", header: "Description" },
 
-                    {
-                      accessorKey: "member",
-                      header: "Member",
-                    },
-                    {
-                      accessorKey: "remarks",
-                      header: "Remarks",
-                    },
-                    {
-                      accessorKey: "status",
-                      header: "Status",
-                    },
+                    { accessorKey: "member", header: "Member" },
+                    { accessorKey: "remarks", header: "Remarks" },
+                    { accessorKey: "status", header: "Status" },
                   ]}
                   achievementsColumns={[
                     { accessorKey: "title", header: "Title" },
                     { accessorKey: "achievement", header: "Acheivement" },
                   ]}
                   eventsColumns={[
-                    {
-                      accessorKey: "club",
-                      header: "Club",
-                    },
-                    {
-                      accessorKey: "event_name",
-                      header: "Event Name",
-                    },
-                    {
-                      accessorKey: "incharge",
-                      header: "Incharge",
-                    },
-                    {
-                      accessorKey: "venue",
-                      header: "Venue",
-                    },
+                    { accessorKey: "club", header: "Club" },
+                    { accessorKey: "event_name", header: "Event Name" },
+                    { accessorKey: "incharge", header: "Incharge" },
+                    { accessorKey: "venue", header: "Venue" },
                     {
                       accessorKey: "start_date",
                       header: "Start Date",
@@ -234,10 +208,7 @@ function GymkhanaDashboard() {
                       render: (data) => data.start_time.substring(0, 5), // optional formatting (HH:MM)
                     },
 
-                    {
-                      accessorKey: "details",
-                      header: "Details",
-                    },
+                    { accessorKey: "details", header: "Details" },
                   ]}
                 />
               )}

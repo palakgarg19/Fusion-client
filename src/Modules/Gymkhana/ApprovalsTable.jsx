@@ -202,11 +202,7 @@ function EventApprovals({ clubName }) {
 
   const approveCounsellorMutation = useMutation({
     mutationFn: (eventId) => approveCounsellorEventButton(eventId, token),
-    onSuccess: () => {
-      alert("Approved by Counsellor");
-      closeViewModal();
-      refetchEvents();
-    },
+    onSuccess: () => refetchEvents(),
   });
 
   const approveDeanMutation = useMutation({

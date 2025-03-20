@@ -11,9 +11,9 @@ import CoordinatorMembersWithProviders from "./CoordinatorMembersTable";
 import BudgetApprovalsWithProviders from "./BudgetApprovalTable";
 import FestForm from "./FestForm";
 import { useGetCurrentLoginnedRoleRelatedClub } from "./BackendLogic/ApiRoutes";
+import CustomTable from "./CustomTable";
 
 const RegistrationForm = lazy(() => import("./RegistrationForm"));
-const CustomTable = lazy(() => import("./CustomTable"));
 const EventForm = lazy(() => import("./EventForm"));
 const BudgetForm = lazy(() => import("./BudgetForm"));
 
@@ -96,33 +96,27 @@ function ClubViewComponent({
         );
       case "Members":
         return (
-          <Suspense fallback={<div>Loading Members Table</div>}>
-            <CustomTable
-              data={membersData}
-              columns={membersColumns}
-              TableName="Members"
-            />
-          </Suspense>
+          <CustomTable
+            data={membersData}
+            columns={membersColumns}
+            TableName="Members"
+          />
         );
       case "Achievements":
         return (
-          <Suspense fallback={<div>Loading Acheievements ...</div>}>
-            <CustomTable
-              columns={achievementsColumns}
-              data={achievementsData}
-              TableName="Acheievements"
-            />
-          </Suspense>
+          <CustomTable
+            columns={achievementsColumns}
+            data={achievementsData}
+            TableName="Acheievements"
+          />
         );
       case "Events":
         return (
-          <Suspense fallback={<div>Loading Events Table.....</div>}>
-            <CustomTable
-              columns={eventsColumns}
-              data={eventsData}
-              TableName="Events"
-            />
-          </Suspense>
+          <CustomTable
+            columns={eventsColumns}
+            data={eventsData}
+            TableName="Events"
+          />
         );
       case "Events Approval":
         return (
