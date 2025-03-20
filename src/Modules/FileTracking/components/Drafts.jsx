@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import EditDraft from "./EditDraft";
 import {
   createArchiveRoute,
+  createFileRoute,
   getDraftRoute,
 } from "../../../routes/filetrackingRoutes";
 
@@ -83,8 +84,14 @@ export default function Draft() {
   };
 
   const handleDeleteFile = async (fileID) => {
-    // const response = await axios.delete
-    setFiles((prevFiles) => prevFiles.filter((file) => file.fileID !== fileID));
+    // eslint-disable-next-line no-unused-vars
+    const response = await axios.delete(`${createFileRoute}${fileID}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileID));
     notifications.show({
       title: "File deleted",
       message: "The file has been successfully deleted",
@@ -106,7 +113,13 @@ export default function Draft() {
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: "#F5F7F8", maxWidth: "100%" }}
+      style={{
+        backgroundColor: "#F5F7F8",
+        position: "absolute",
+        height: "70vh",
+        width: "90vw",
+        overflowY: "auto",
+      }}
     >
       {!editFile && (
         <Title

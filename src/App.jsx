@@ -6,6 +6,10 @@ import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Notifications } from "@mantine/notifications";
 import { Layout } from "./components/layout";
 
+// import { IwdRoutes } from "./Modules/Iwd/routes/index";
+import IwdModule from "./Modules/Iwd/index";
+import { DesignationsProvider } from "./Modules/Iwd/helper/designationContext";
+
 const Dashboard = lazy(
   () => import("./Modules/Dashboard/dashboardNotifications"),
 );
@@ -101,6 +105,14 @@ export default function App() {
               <Suspense fallback={<div>Loading .... </div>}>
                 <MessPage />
               </Suspense>
+            </Layout>
+          }
+        />
+        <Route
+          path="/mess"
+          element={
+            <Layout>
+              <MessPage />
             </Layout>
           }
         />
@@ -261,6 +273,137 @@ export default function App() {
               <Suspense fallback={<div>Loading .... </div>}>
                 <DepartmentPage />
               </Suspense>
+            </Layout>
+          }
+        />
+        <Route
+          path="/iwd"
+          element={
+            <DesignationsProvider>
+              <Layout>
+                <IwdModule />
+              </Layout>
+            </DesignationsProvider>
+          }
+        />
+        <Route
+          path="/filetracking"
+          element={
+            <Layout>
+              <FileTracking />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <Bookings />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/cancel_request"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <CancellationRequest />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/active_bookings"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <ActiveBookingsPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/completed_bookings"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <CompletedBookingsPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/booking-form"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <BookingForm />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/room-availability"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <RoomsAvailibility />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/mess-record"
+          element={
+            <Layout>
+              <VisitorsContent />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/inventory"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <InventoryManagement />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/account-statement"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <AccountStatemnts />
+            </Layout>
+          }
+        />
+        <Route
+          path="/visitors_hostel/rules"
+          element={
+            <Layout>
+              <VisitorsContent />
+              <VHGuidelinesPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/facultyprofessionalprofile/*"
+          element={
+            <Layout>
+              <FacultyProfessionalProfile />
+            </Layout>
+          }
+        />
+        <Route
+          path="/complaints"
+          element={
+            <Layout>
+              <ComplaintSystem />
+            </Layout>
+          }
+        />
+        <Route
+          path="/department"
+          element={
+            <Layout>
+              <DepartmentPage />
             </Layout>
           }
         />

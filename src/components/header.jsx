@@ -36,7 +36,6 @@ function Header({ opened, toggleSidebar }) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   // const queryclient = useQueryClient();
   const isMobile = useMediaQuery("(max-width: 500px)");
 
