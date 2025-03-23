@@ -49,7 +49,6 @@ function BudgetApprovalForm({
         typeof value !== "number" || Number.isNaN(value) || value <= 0
           ? "Budget amount must be a positive number"
           : null,
-      status: (value) => (value.length === 0 ? "Status cannot be empty" : null),
       remarks: (value) =>
         value.length === 0 ? "Remarks cannot be empty" : null,
       budget_file: (value) => (!value ? "You must attach a PDF" : null), // File validation
@@ -170,19 +169,6 @@ function BudgetApprovalForm({
           error={form.errors.budget_file}
           disabled={editMode && disabledFields.includes("budget_file")}
           accept=".pdf"
-          withAsterisk
-        />
-
-        {/* Status */}
-        <TextInput
-          label="Status"
-          placeholder="Enter the status"
-          value={form.values.status}
-          onChange={(event) =>
-            form.setFieldValue("status", event.currentTarget.value)
-          }
-          error={form.errors.status}
-          disabled={editMode && disabledFields.includes("status")}
           withAsterisk
         />
 
