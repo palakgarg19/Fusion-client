@@ -164,7 +164,7 @@ function BudgetApprovals({ clubName }) {
   const updateBudgetMutation = useMutation({
     mutationFn: (updatedBudgetData) => {
       return axios.put(
-        "http://127.0.0.1:8000/gymkhana/api/update_budget/",
+        `${host}/gymkhana/api/update_budget/`,
         updatedBudgetData,
         {
           headers: {
@@ -240,7 +240,7 @@ function BudgetApprovals({ clubName }) {
   const updateAllocatedBudgetMutation = useMutation({
     mutationFn: (updatedBudgetData) => {
       return axios.put(
-        "http://127.0.0.1:8000/gymkhana/api/counsellor_approve_budget/",
+        `${host}/gymkhana/api/counsellor_approve_budget/`,
         updatedBudgetData,
         {
           headers: {

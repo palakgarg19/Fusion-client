@@ -13,6 +13,7 @@ import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "./GymkhanaForms.css";
+import { host } from "../../routes/globalRoutes/index.jsx";
 
 function BudgetApprovalForm({
   clubName,
@@ -69,7 +70,7 @@ function BudgetApprovalForm({
       formData.append("budget_file", newBudgetData.budget_file); // Attach the file
 
       return axios.put(
-        "http://127.0.0.1:8000/gymkhana/api/new_budget/", // API URL for the budget submission
+        `${host}/gymkhana/api/new_budget/`, // API URL for the budget submission
         newBudgetData,
         {
           headers: {

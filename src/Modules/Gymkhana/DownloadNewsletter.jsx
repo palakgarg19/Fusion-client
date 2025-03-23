@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Alert, Radio } from "@mantine/core";
 import axios from "axios";
+import { host } from "../../routes/globalRoutes/index.jsx";
 
 function DownloadNewsletter() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -9,7 +10,7 @@ function DownloadNewsletter() {
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/gymkhana/api/newsletter_pdf/?timeframe=${selectedOption}`,
+        `${host}/gymkhana/api/newsletter_pdf/?timeframe=${selectedOption}`,
         {
           responseType: "blob",
           headers: {

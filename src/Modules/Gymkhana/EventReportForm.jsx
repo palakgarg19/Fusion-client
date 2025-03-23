@@ -18,7 +18,7 @@ import "./GymkhanaForms.css";
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { authRoute } from "../../routes/globalRoutes";
+import { host, authRoute } from "../../routes/globalRoutes";
 import { useGetNewsLetterEvent } from "./BackendLogic/ApiRoutes";
 
 export const useCreateNewEvent = (
@@ -37,16 +37,12 @@ export const useCreateNewEvent = (
         }
       });
 
-      return axios.post(
-        "http://127.0.0.1:8000/gymkhana/api/add_event_report/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Token ${token}`,
-          },
+      return axios.post(`${host}/gymkhana/api/add_event_report/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Token ${token}`,
         },
-      );
+      });
     },
     onSuccess: (response) => {
       console.log("Successfully created event:", response.data);

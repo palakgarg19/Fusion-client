@@ -142,15 +142,11 @@ function EventApprovals({ clubName }) {
 
   const updateEventMutation = useMutation({
     mutationFn: (updatedEventData) => {
-      return axios.put(
-        "http://127.0.0.1:8000/gymkhana/api/update_event/",
-        updatedEventData,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
+      return axios.put(`${host}/gymkhana/api/update_event/`, updatedEventData, {
+        headers: {
+          Authorization: `Token ${token}`,
         },
-      );
+      });
     },
     onSuccess: () => {
       closeEditModal();
