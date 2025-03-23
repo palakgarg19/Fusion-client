@@ -25,10 +25,10 @@ function ModuleTabs({ tabs, activeTab, setActiveTab, badges = [] }) {
       left: direction === "next" ? 50 : -50,
       behavior: "smooth",
     });
-    // tabsListContainerRef.current.scrollBy({
-    //   left: direction === "next" ? 50 : -50,
-    //   behavior: "smooth",
-    // });
+    tabsListContainerRef.current.scrollBy({
+      left: direction === "next" ? 50 : -50,
+      behavior: "smooth",
+    });
   };
 
   const handleTabClick = (index) => {
@@ -59,7 +59,8 @@ function ModuleTabs({ tabs, activeTab, setActiveTab, badges = [] }) {
               style={{
                 display: "flex",
                 flexWrap: "nowrap",
-                overflowX: isMobile ? "scroll" : "none",
+                overflowX: "scroll",
+                width: "320px",
               }}
               ref={tabsListContainerRef}
             >

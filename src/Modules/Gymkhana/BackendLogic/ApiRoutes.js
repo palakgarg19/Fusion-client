@@ -294,6 +294,17 @@ export const approveCounsellorBudgetButton = async (budgetId, token) => {
 };
 
 // API call to approve budget by Dean
+export const reviewDeanBudgetButton = async (budgetId, token) => {
+  return axios.put(
+    "http://localhost:8000/gymkhana/api/dean_review_budget/",
+    { id: budgetId },
+    {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    },
+  );
+};
 export const approveDeanBudgetButton = async (budgetId, token) => {
   return axios.put(
     "http://localhost:8000/gymkhana/api/dean_approve_budget/",

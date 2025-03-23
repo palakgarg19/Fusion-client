@@ -127,7 +127,7 @@ function ClubViewComponent({
           <CustomTable
             columns={eventsColumns}
             data={eventsData}
-            TableName="Events"
+            TableName="Events2"
           />
         );
       case "Events Approval":

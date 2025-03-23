@@ -55,12 +55,10 @@ function NewsForm({
         headers: { Authorization: `Token ${token}` },
       });
 
-      console.log("User Data for event:", data);
       if (!roll_no) {
         setRollNo(data.roll_no);
         localStorage.setItem("roll_no", data.roll_no); // Store globally
       }
-      console.log(roll_no);
     } catch (error) {
       console.error("User validation failed:", error);
       notifications.show({
@@ -136,9 +134,7 @@ function NewsForm({
     const formattedValues = {
       ...values,
     };
-    console.log(formattedValues);
     mutation.mutate(formattedValues);
-    console.log(form);
   };
 
   return (

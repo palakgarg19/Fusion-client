@@ -318,7 +318,6 @@ function GymkhanaDashboard() {
                 <CustomTable
                   data={upcomingEvents}
                   columns={[
-                    { accessorKey: "id", header: "ID" },
                     { accessorKey: "club", header: "Club" },
                     { accessorKey: "event_name", header: "Event Name" },
                     { accessorKey: "incharge", header: "Incharge" },
@@ -340,7 +339,6 @@ function GymkhanaDashboard() {
                       header: "Start Time",
                       render: (data) => data.start_time.substring(0, 5),
                     },
-                    { accessorKey: "status", header: "Status" },
                     { accessorKey: "details", header: "Details" },
                   ]}
                   TableName="Upcoming Events"
@@ -354,7 +352,6 @@ function GymkhanaDashboard() {
                 <CustomTable
                   data={pastEvents}
                   columns={[
-                    { accessorKey: "id", header: "ID" },
                     { accessorKey: "club", header: "Club" },
                     { accessorKey: "event_name", header: "Event Name" },
                     { accessorKey: "incharge", header: "Incharge" },
@@ -376,7 +373,6 @@ function GymkhanaDashboard() {
                       header: "Start Time",
                       render: (data) => data.start_time.substring(0, 5),
                     },
-                    { accessorKey: "status", header: "Status" },
                     { accessorKey: "details", header: "Details" },
                   ]}
                   TableName="Past Events"

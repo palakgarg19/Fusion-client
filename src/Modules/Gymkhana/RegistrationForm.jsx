@@ -15,7 +15,7 @@ function ClubRegistrationForm({ clubName }) {
   const form = useForm({
     initialValues: {
       name: user.username,
-      rollNumber: null,
+      rollNumber: user.roll_no,
       achievements: "",
       experience: "",
       club: clubName,
@@ -25,7 +25,7 @@ function ClubRegistrationForm({ clubName }) {
       name: (value) =>
         value.length < 2 ? "First name must have at least 2 letters" : null,
       rollNumber: (value) =>
-        value.length < 8 ? "Roll no must have at least 8 letters" : null,
+        value.length < 6 ? "Roll no must have at least 8 letters" : null,
     },
   });
   // TODO need to add logic for addition to DB
@@ -81,7 +81,7 @@ function ClubRegistrationForm({ clubName }) {
             form.setFieldValue("name", event.currentTarget.value)
           }
           error={form.errors.name}
-          withAsterisk
+          disabled
         />
 
         {/* Roll Number */}
@@ -93,7 +93,7 @@ function ClubRegistrationForm({ clubName }) {
             form.setFieldValue("rollNumber", event.currentTarget.value)
           }
           error={form.errors.rollNumber}
-          withAsterisk
+          disabled
         />
 
         {/* Achievements */}

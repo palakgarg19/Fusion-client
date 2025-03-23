@@ -24,6 +24,7 @@ import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { notifications } from "@mantine/notifications";
 import {
   rejectEventButton,
   modifyEventButton,
@@ -184,7 +185,15 @@ function EventApprovals({ clubName }) {
       },
       onError: (error) => {
         console.error("Error during posting comment", error);
-        alert("Error during posting comment");
+        notifications.show({
+          title: "Approved by FIC",
+          message: (
+            <Flex gap="4px">
+              <Text fz="sm">Error during posting comment</Text>
+            </Flex>
+          ),
+          color: "green",
+        });
       },
     });
   };
@@ -194,7 +203,15 @@ function EventApprovals({ clubName }) {
       approveFICEventButton(eventId, token);
     },
     onSuccess: () => {
-      alert("Approved by FIC");
+      notifications.show({
+        title: "Approved by FIC",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Error during posting comment</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
       refetchEvents();
     },
@@ -208,7 +225,15 @@ function EventApprovals({ clubName }) {
   const approveDeanMutation = useMutation({
     mutationFn: (eventId) => approveDeanEventButton(eventId, token),
     onSuccess: () => {
-      alert("Approved by Dean Student");
+      notifications.show({
+        title: "Approved by Dean Student",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Approved by Dean Student</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
       refetchEvents();
     },

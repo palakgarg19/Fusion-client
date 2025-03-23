@@ -5,8 +5,9 @@ import axios from "axios";
 function DownloadNewsletter() {
   const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem("authToken");
-  const [selectedOption, setSelectedOption] = useState("weekly");
-
+  const [selectedOption, setSelectedOption] = useState("6 months");
+  console.log(token, "---------");
+  console.log(selectedOption);
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
@@ -60,8 +61,8 @@ function DownloadNewsletter() {
             alignItems: "center",
           }}
         >
-          <Radio value="weekly" label="Weekly" />
-          <Radio value="monthly" label="Monthly" />
+          {/* <Radio value="weekly" label="Weekly" /> */}
+          {/* <Radio value="monthly" label="Monthly" /> */}
           <Radio value="6 months" label="6 Months" />
         </Radio.Group>
       </div>

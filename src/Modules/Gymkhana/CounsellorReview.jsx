@@ -14,7 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "./GymkhanaForms.css";
 
-function BudgetApprovalForm({
+function CounsellorReview({
   clubName,
   initialValues,
   onSubmit,
@@ -25,8 +25,6 @@ function BudgetApprovalForm({
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Set up the form with initial values and validation
   const form = useForm({
     initialValues: initialValues || {
       budget_for: "",
@@ -42,6 +40,8 @@ function BudgetApprovalForm({
     validate: {
       budget_for: (value) =>
         value.length === 0 ? "Budget for cannot be empty" : null,
+      budget_allocated: (value) =>
+        value.length === 0 ? "Budget Allocated cannot be empty" : null,
       description: (value) =>
         value.length === 0 ? "Description cannot be empty" : null,
       budget_requested: (value) =>
@@ -49,27 +49,16 @@ function BudgetApprovalForm({
           ? "Budget amount must be a positive number"
           : null,
       status: (value) => (value.length === 0 ? "Status cannot be empty" : null),
-      remarks: (value) =>
-        value.length === 0 ? "Remarks cannot be empty" : null,
-      budget_file: (value) => (!value ? "You must attach a PDF" : null), // File validation
+      //   remarks: (value) =>
+      //     value.length === 0 ? "Remarks cannot be empty" : null,
+      //   budget_file: (value) => (!value ? "You must attach a PDF" : null), // File validation
     },
   });
 
-  // Mutation setup for submitting the form data via API
   const mutation = useMutation({
     mutationFn: (newBudgetData) => {
-      // Create a FormData object for file upload
-      const formData = new FormData();
-      formData.append("budget_for", newBudgetData.budget_for);
-      formData.append("description", newBudgetData.description);
-      formData.append("budget_requested", newBudgetData.budget_requested);
-      formData.append("status", newBudgetData.status);
-      formData.append("remarks", newBudgetData.remarks);
-      formData.append("club", newBudgetData.club);
-      formData.append("budget_file", newBudgetData.budget_file); // Attach the file
-
       return axios.put(
-        "http://127.0.0.1:8000/gymkhana/api/new_budget/", // API URL for the budget submission
+        "http://127.0.0.1:8000/gymkhana/api/counsellor_approve_budget/", // API URL for the budget submission
         newBudgetData,
         {
           headers: {
@@ -95,11 +84,16 @@ function BudgetApprovalForm({
       onSubmit(values);
       return;
     }
-    const formattedValues = {
-      ...values,
-    };
-    mutation.mutate(formattedValues);
+    const formData = new FormData();
+    // Append all values to FormData
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== undefined && values[key] !== null) {
+        formData.append(key, values[key]);
+      }
+    });
+    mutation.mutate(formData);
   };
+
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
@@ -110,14 +104,12 @@ function BudgetApprovalForm({
             {successMessage}
           </Alert>
         )}
-
         {/* Error Message */}
         {errorMessage && (
           <Alert title="Error" color="red" mt="md" className="club-message">
             {errorMessage}
           </Alert>
         )}
-
         {/* Budget For */}
         <TextInput
           label="Budget For"
@@ -130,7 +122,6 @@ function BudgetApprovalForm({
           disabled={editMode && disabledFields.includes("budget_for")}
           withAsterisk
         />
-
         {/* Description */}
         <TextInput
           label="Description"
@@ -143,24 +134,53 @@ function BudgetApprovalForm({
           disabled={editMode && disabledFields.includes("description")}
           withAsterisk
         />
-
         {/* Budget Amount */}
         <TextInput
           label="Budget Amount"
           placeholder="Enter budget amount"
-          type="number" // Specify the input type as number
+          type="number"
           value={form.values.budget_requested}
           onChange={(event) => {
-            const value = parseFloat(event.currentTarget.value); // Convert input to a number
+            const value = parseFloat(event.currentTarget.value);
             form.setFieldValue(
               "budget_requested",
               Number.isNaN(value) ? 0 : value,
-            ); // Handle NaN
+            );
           }}
           error={form.errors.budget_requested}
+          disabled={editMode && disabledFields.includes("budget_requested")}
           withAsterisk
         />
 
+        {/* Budget Allocated */}
+        <TextInput
+          label="Budget Allocated"
+          placeholder="Enter allocated budget"
+          type="number"
+          value={form.values.budget_allocated}
+          onChange={(event) => {
+            const value = parseFloat(event.currentTarget.value);
+            form.setFieldValue(
+              "budget_allocated",
+              Number.isNaN(value) ? 0 : value,
+            );
+          }}
+          error={form.errors.budget_allocated}
+          disabled={!editMode} // Only editable in editMode
+          withAsterisk
+        />
+        {/* Budget Comment (Editable) */}
+        <TextInput
+          label="Budget Comment"
+          placeholder="Enter a new comment"
+          value={form.values.budget_comment ?? ""} // Ensure it's never null
+          onChange={(event) =>
+            form.setFieldValue("budget_comment", event.currentTarget.value)
+          }
+          error={form.errors.budget_comment}
+          disabled={!editMode} // Make it editable only in editMode
+          withAsterisk
+        />
         {/* PDF Upload */}
         <FileInput
           label="Attach PDF"
@@ -171,7 +191,6 @@ function BudgetApprovalForm({
           accept=".pdf"
           withAsterisk
         />
-
         {/* Status */}
         <TextInput
           label="Status"
@@ -184,7 +203,6 @@ function BudgetApprovalForm({
           disabled={editMode && disabledFields.includes("status")}
           withAsterisk
         />
-
         {/* Remarks */}
         <TextInput
           label="Remarks"
@@ -197,12 +215,10 @@ function BudgetApprovalForm({
           disabled={editMode && disabledFields.includes("remarks")}
           withAsterisk
         />
-
         {/* Submit Button */}
-
         <Group position="center" mt="md" className="submit-container">
           <Button type="submit" className="submit-btn">
-            {editMode ? "Update" : "Submit"}
+            {editMode ? "Accept" : "Submit"}
           </Button>
         </Group>
       </form>
@@ -221,7 +237,7 @@ function BudgetApprovalForm({
   );
 }
 
-BudgetApprovalForm.propTypes = {
+CounsellorReview.propTypes = {
   clubName: PropTypes.string.isRequired,
   initialValues: PropTypes,
   onSubmit: PropTypes.func,
@@ -229,17 +245,4 @@ BudgetApprovalForm.propTypes = {
   disabledFields: PropTypes.arrayOf(PropTypes.string),
 };
 
-function BudgetForm({ clubName }) {
-  return (
-    <Container>
-      <BudgetApprovalForm clubName={clubName} />
-    </Container>
-  );
-}
-
-BudgetForm.propTypes = {
-  clubName: PropTypes.string.isRequired,
-};
-
-export { BudgetApprovalForm };
-export default BudgetForm;
+export default CounsellorReview;

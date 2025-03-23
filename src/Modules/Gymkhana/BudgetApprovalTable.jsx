@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import { notifications } from "@mantine/notifications";
 import {
   useGetUpcomingBudgets,
   useGetCommentsBudgetInfo,
@@ -29,9 +30,11 @@ import {
   approveDeanBudgetButton,
   rejectBudgetButton,
   modifyBudgetButton,
+  reviewDeanBudgetButton,
 } from "./BackendLogic/ApiRoutes";
 
 import { BudgetApprovalForm } from "./BudgetForm";
+import CounsellorReview from "./CounsellorReview";
 
 function BudgetApprovals({ clubName }) {
   const user = useSelector((state) => state.user);
@@ -55,8 +58,16 @@ function BudgetApprovals({ clubName }) {
         header: "Budget Title",
       },
       {
-        accessorKey: "budget_amt",
-        header: "Amount",
+        accessorKey: "budget_requested",
+        header: "Budget Requested",
+      },
+      {
+        accessorKey: "budget_allocated",
+        header: "Budget Allocated",
+      },
+      {
+        accessorKey: "budget_comment",
+        header: "Budget Comment",
       },
       {
         accessorKey: "remarks",
@@ -98,6 +109,17 @@ function BudgetApprovals({ clubName }) {
           userRole.toLowerCase() === "professor" ||
           userRole.toLowerCase() === "assistant professor" ||
           userRole.toLowerCase() === "co-ordinator"
+        ) {
+          return true;
+        }
+      }
+      if (budget.status.toLowerCase() === "rereview") {
+        if (
+          userRole.toLowerCase() === "counsellor" ||
+          userRole.toLowerCase() === "professor" ||
+          userRole.toLowerCase() === "assistant professor" ||
+          userRole.toLowerCase() === "co-ordinator" ||
+          userRole.toLowerCase() === "dean_s"
         ) {
           return true;
         }
@@ -184,7 +206,15 @@ function BudgetApprovals({ clubName }) {
       },
       onError: (error) => {
         console.error("Error during posting comment", error);
-        alert("Error during posting comment");
+        notifications.show({
+          title: "Error",
+          message: (
+            <Flex gap="4px">
+              <Text fz="sm">Error during posting comment</Text>
+            </Flex>
+          ),
+          color: "green",
+        });
       },
     });
   };
@@ -192,8 +222,34 @@ function BudgetApprovals({ clubName }) {
   const approveFICMutation = useMutation({
     mutationFn: (budgetId) => approveFICBudgetButton(budgetId, token),
     onSuccess: () => {
-      alert("Approved by FIC");
+      notifications.show({
+        title: "Approved by FIC",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Approved by FIC</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
+      refetchBudget();
+    },
+  });
+
+  const updateAllocatedBudgetMutation = useMutation({
+    mutationFn: (updatedBudgetData) => {
+      return axios.put(
+        "http://127.0.0.1:8000/gymkhana/api/counsellor_approve_budget/",
+        updatedBudgetData,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      closeEditModal();
       refetchBudget();
     },
   });
@@ -201,7 +257,15 @@ function BudgetApprovals({ clubName }) {
   const approveCounsellorMutation = useMutation({
     mutationFn: (budgetId) => approveCounsellorBudgetButton(budgetId, token),
     onSuccess: () => {
-      alert("Approved by Counsellor");
+      notifications.show({
+        title: "Approved by Counsellor",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Approved by Counsellor</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
       refetchBudget();
     },
@@ -210,7 +274,32 @@ function BudgetApprovals({ clubName }) {
   const approveDeanMutation = useMutation({
     mutationFn: (budgetId) => approveDeanBudgetButton(budgetId, token),
     onSuccess: () => {
-      alert("Approved by Dean");
+      notifications.show({
+        title: "Approved by Dean",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Approved by Dean</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
+      closeViewModal();
+      refetchBudget();
+    },
+  });
+
+  const reviewDeanMutation = useMutation({
+    mutationFn: (budgetId) => reviewDeanBudgetButton(budgetId, token),
+    onSuccess: () => {
+      notifications.show({
+        title: "Review by Dean",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Review by Dean</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
       refetchBudget();
     },
@@ -219,7 +308,15 @@ function BudgetApprovals({ clubName }) {
   const rejectMutation = useMutation({
     mutationFn: (budgetId) => rejectBudgetButton(budgetId, token),
     onSuccess: () => {
-      alert("Rejected");
+      notifications.show({
+        title: "Rejected",
+        message: (
+          <Flex gap="4px">
+            <Text fz="sm">Rejected</Text>
+          </Flex>
+        ),
+        color: "green",
+      });
       closeViewModal();
       refetchBudget();
     },
@@ -241,6 +338,10 @@ function BudgetApprovals({ clubName }) {
   };
   const handleDeanApproveButton = (budgetId) => {
     approveDeanMutation.mutate(budgetId);
+  };
+
+  const handleDeanReviewButton = (budgetId) => {
+    reviewDeanMutation.mutate(budgetId);
   };
 
   const handleRejectButton = (budgetId) => {
@@ -318,6 +419,12 @@ function BudgetApprovals({ clubName }) {
           >
             Reject
           </Button>
+          <Button
+            color="yellow"
+            onClick={() => handleDeanReviewButton(selectedBudget.id)}
+          >
+            ReReview
+          </Button>
         </>
       );
     }
@@ -353,6 +460,16 @@ function BudgetApprovals({ clubName }) {
               </ActionIcon>
             </Tooltip>
           )}
+        {row.original.status === "REREVIEW" && userRole === "Counsellor" && (
+          <Tooltip label="Edit">
+            <ActionIcon
+              color="blue"
+              onClick={() => openEditModal(row.original)}
+            >
+              <IconEdit />
+            </ActionIcon>
+          </Tooltip>
+        )}
         <Pill
           bg={
             row.original.status === "ACCEPT"
@@ -405,7 +522,7 @@ function BudgetApprovals({ clubName }) {
                   {selectedBudget.budget_for}
                 </Text>
                 <Text size="15px" weight={700}>
-                  <b>Amount Requested: </b> {selectedBudget.budget_amt}
+                  <b>Amount Requested: </b> {selectedBudget.budget_requested}
                 </Text>
                 <Text size="15px" weight={700}>
                   <b>Description: </b>
@@ -515,7 +632,7 @@ function BudgetApprovals({ clubName }) {
         title="Edit Budget"
         size="lg"
       >
-        {selectedBudget && (
+        {selectedBudget && selectedBudget.status !== "REREVIEW" && (
           <BudgetApprovalForm
             clubName={clubName}
             initialValues={{
@@ -525,9 +642,7 @@ function BudgetApprovals({ clubName }) {
               const formData = new FormData();
 
               // Add the text data (details)
-              formData.append("budget_amt", values.budget_amt);
-              formData.append("budget_file", values.budget_file);
-              formData.append("remarks", values.remarks);
+              formData.append("budget_requested", values.budget_requested);
 
               // Add the ID of the event
               formData.append("id", selectedBudget.id);
@@ -537,14 +652,43 @@ function BudgetApprovals({ clubName }) {
             }}
             editMode
             disabledFields={[
+              "busget_allocated",
+              "budget_comment",
               "budget_for",
-              // "budget_file",
+              "budget_file",
               "description",
               "status",
-              // "remarks",
+              "remarks",
             ]}
           />
         )}
+        {selectedBudget &&
+          userRole === "Counsellor" &&
+          selectedBudget?.status === "REREVIEW" && (
+            <CounsellorReview
+              clubName={clubName}
+              initialValues={{
+                ...selectedBudget,
+              }}
+              onSubmit={(values) => {
+                const formData = new FormData();
+                formData.append("budget_allocated", values.budget_allocated);
+                formData.append("budget_comment", values.budget_comment);
+                formData.append("id", selectedBudget.id);
+
+                updateAllocatedBudgetMutation.mutate(formData);
+              }}
+              editMode
+              disabledFields={[
+                "budget_requested",
+                "budget_for",
+                "budget_file",
+                "description",
+                "status",
+                "remarks",
+              ]}
+            />
+          )}
       </Modal>
     </>
   );
