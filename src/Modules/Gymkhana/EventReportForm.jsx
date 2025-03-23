@@ -37,7 +37,6 @@ export const useCreateNewEvent = (
         }
       });
 
-      console.log(formData);
       return axios.post(
         "http://127.0.0.1:8000/gymkhana/api/add_event_report/",
         formData,
@@ -97,12 +96,10 @@ function EventReportForm({
         headers: { Authorization: `Token ${token}` },
       });
 
-      console.log("User Data for event:", data);
       if (!roll_no) {
         setRollNo(data.roll_no);
         localStorage.setItem("roll_no", data.roll_no); // Store globally
       }
-      console.log(roll_no);
     } catch (error) {
       console.error("User validation failed:", error);
       notifications.show({
@@ -185,9 +182,8 @@ function EventReportForm({
       event_budget: Number(values.event_budget),
       club: clubName,
     };
-    console.log("Formatted values for submission:", formattedValues);
+
     mutation.mutate(formattedValues);
-    console.log(form);
   };
 
   return (

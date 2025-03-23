@@ -6,8 +6,6 @@ function DownloadNewsletter() {
   const [errorMessage, setErrorMessage] = useState("");
   const token = localStorage.getItem("authToken");
   const [selectedOption, setSelectedOption] = useState("6 months");
-  console.log(token, "---------");
-  console.log(selectedOption);
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.get(
@@ -29,7 +27,6 @@ function DownloadNewsletter() {
     } catch {
       setErrorMessage("Failed to download the newsletter PDF.");
     }
-    console.log(selectedOption);
   };
 
   return (
