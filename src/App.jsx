@@ -10,6 +10,8 @@ import { Layout } from "./components/layout";
 // import { IwdRoutes } from "./Modules/Iwd/routes/index";
 import IwdModule from "./Modules/Iwd/index";
 import { DesignationsProvider } from "./Modules/Iwd/helper/designationContext";
+import { HealthCenter } from "./Modules/Health Center";
+
 // eslint-disable-next-line import/no-unresolved
 import ConvenorBreadcumbs from "./Modules/Scholarship/convenor/components/ConvenorBreadcumbs";
 import UserBreadcrumbs from "./Modules/Scholarship/user/components/UserBreadcumbs";
@@ -426,6 +428,7 @@ export default function App() {
           }
         />
 
+        <Route path="/healthcenter/*" element={<HealthCenter />} />
         <Route path="/accounts/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ForgotPassword />} />
         <Route
