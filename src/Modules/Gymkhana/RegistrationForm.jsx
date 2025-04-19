@@ -1,39 +1,77 @@
 import React from "react";
-import { useForm, isEmail } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import { TextInput, Textarea, Button, Group, Container } from "@mantine/core";
 
 import "./GymkhanaForms.css";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { host } from "../../routes/globalRoutes/index.jsx";
 
-function ClubRegistrationForm() {
+function ClubRegistrationForm({ clubName }) {
+  const token = localStorage.getItem("authToken");
   // Set up the form with initial values and validation
+  const user = useSelector((state) => state.user);
   const form = useForm({
     initialValues: {
-      name: "",
-      rollNumber: null,
-      email: "",
+      name: user.username,
+      rollNumber: user.roll_no,
       achievements: "",
       experience: "",
+      club: clubName,
     },
 
     validate: {
       name: (value) =>
         value.length < 2 ? "First name must have at least 2 letters" : null,
       rollNumber: (value) =>
-        value.length < 8 ? "Roll no must have at least 8 letters" : null,
-      email: (value) => (isEmail(value) ? null : "Invalid email format"),
+        value.length < 6 ? "Roll no must have at least 8 letters" : null,
     },
   });
-
+  // TODO need to add logic for addition to DB
+  const mutation = useMutation({
+    mutationFn: (newMemberData) => {
+      return axios.post(
+        `${host}/gymkhana/api/club_membership/`,
+        {
+          member: newMemberData.rollNumber,
+          club: newMemberData.club,
+          description:
+            `Experience: ${newMemberData.experience}` +
+            `\n` +
+            `Acheivement: ${newMemberData.achievements}`,
+        },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }, // Replace with your actual API endpoint
+      );
+    },
+  });
   // Submit handler
   const handleSubmit = (values) => {
-    console.log("Form submitted:", values);
-    // Add your submission logic here
+    mutation.mutate(values, {
+      onSuccess: (response) => {
+        // Handle success (you can redirect or show a success message)
+        console.log("Successfully registered:", response.data);
+        alert("Registration successful!");
+      },
+      onError: (error) => {
+        // Handle error (you can show an error message)
+        console.error("Error during registration:", error);
+        alert("Registration failed. Please try again.");
+      },
+    });
   };
 
   return (
     <Container>
       <form onSubmit={form.onSubmit(handleSubmit)} className="club-form">
+        <h2 className="club-header">
+          Hello from {clubName} - Enter your details for Registering !!!
+        </h2>
         {/* Name */}
         <TextInput
           label="Name"
@@ -43,7 +81,7 @@ function ClubRegistrationForm() {
             form.setFieldValue("name", event.currentTarget.value)
           }
           error={form.errors.name}
-          withAsterisk
+          disabled
         />
 
         {/* Roll Number */}
@@ -55,19 +93,7 @@ function ClubRegistrationForm() {
             form.setFieldValue("rollNumber", event.currentTarget.value)
           }
           error={form.errors.rollNumber}
-          withAsterisk
-        />
-
-        {/* Email */}
-        <TextInput
-          label="Email"
-          placeholder="Enter your email"
-          value={form.values.email}
-          onChange={(event) =>
-            form.setFieldValue("email", event.currentTarget.value)
-          }
-          error={form.errors.email}
-          withAsterisk
+          disabled
         />
 
         {/* Achievements */}
@@ -91,10 +117,12 @@ function ClubRegistrationForm() {
         />
 
         {/* Submit Button */}
-        <Group position="center" mt="md">
-          <Button type="submit" className="submit-btn">
-            Submit
-          </Button>
+        <Group position="center" mt="md" className="submit-container">
+          {token && (
+            <Button type="submit" className="submit-btn">
+              Submit
+            </Button>
+          )}
         </Group>
       </form>
     </Container>
@@ -106,14 +134,14 @@ export { ClubRegistrationForm };
 function RegistrationForm({ clubName }) {
   return (
     <Container>
-      <h2 className="club-header">
-        Hello from {clubName} - Enter your details for Registering !!!
-      </h2>
       <ClubRegistrationForm clubName={clubName} />
     </Container>
   );
 }
 RegistrationForm.propTypes = {
+  clubName: PropTypes.string.isRequired,
+};
+ClubRegistrationForm.propTypes = {
   clubName: PropTypes.string.isRequired,
 };
 

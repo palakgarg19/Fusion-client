@@ -1,101 +1,80 @@
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import "mantine-react-table/styles.css";
-import {
-  flexRender,
-  MRT_GlobalFilterTextInput,
-  MRT_TablePagination,
-  MRT_ToolbarAlertBanner,
-  useMantineReactTable,
-  MRT_TableBodyCellValue,
-} from "mantine-react-table";
-import { Divider, Flex, Stack, Table, Title } from "@mantine/core";
+import { Table, Paper, Stack, Divider, Title, Flex } from "@mantine/core";
 import PropTypes from "prop-types";
+import { useState } from "react";
 
-function CustomTable({ data, columns }) {
-  const table = useMantineReactTable({
-    columns,
-    data,
-    enableRowSelection: true,
-    initialState: {
-      pagination: { pageSize: 5, pageIndex: 0 },
-      showGlobalFilter: true,
-    },
+function CustomTable({ data, columns, TableName }) {
+  const [pageIndex, setPageIndex] = useState(0);
+  const pageSize = 5;
 
-    mantinePaginationProps: {
-      rowsPerPageOptions: ["5", "10", "15"],
-    },
-    paginationDisplayMode: "pages",
-  });
+  const paginatedData = data.slice(
+    pageIndex * pageSize,
+    (pageIndex + 1) * pageSize,
+  );
+  const totalPages = Math.ceil(data.length / pageSize);
 
   return (
-    <Stack>
-      <Divider />
-      <Title order={4}>My Custom Headless Table</Title>
-      <Flex justify="space-between" align="center">
-        {/* eslint-disable-next-line react/jsx-pascal-case */}
-        <MRT_GlobalFilterTextInput table={table} />
-        {/* eslint-disable-next-line react/jsx-pascal-case */}
-        <MRT_TablePagination table={table} />
-      </Flex>
+    <Paper withBorder shadow="sm" p="md" style={{ backgroundColor: "white" }}>
+      <Stack style={{ width: "100%" }}>
+        <Divider />
+        <Title order={2} align="center" c="blue">
+          {TableName} Table
+        </Title>
+        <Flex justify="space-between" align="center">
+          <span>
+            Page {pageIndex + 1} of {totalPages}
+          </span>
+          <div>
+            <button
+              disabled={pageIndex === 0}
+              onClick={() => setPageIndex(pageIndex - 1)}
+            >
+              Previous
+            </button>
+            <button
+              disabled={pageIndex === totalPages - 1}
+              onClick={() => setPageIndex(pageIndex + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </Flex>
 
-      <Table
-        captionSide="top"
-        fz="md"
-        highlightOnHover
-        horizontalSpacing="xl"
-        striped
-        verticalSpacing="xs"
-        withTableBorder
-        withColumnBorders
-        m="0"
-      >
-        <Table.Thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <Table.Tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <Table.Th key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.Header ??
-                          header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </Table.Th>
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <Table captionSide="top" striped withTableBorder withColumnBorders>
+            <Table.Thead>
+              <Table.Tr>
+                {columns.map((col) => (
+                  <Table.Th key={col.accessorKey}>{col.header}</Table.Th>
+                ))}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {paginatedData.map((row, rowIndex) => (
+                <Table.Tr key={rowIndex}>
+                  {columns.map((col) => (
+                    <Table.Td key={col.accessorKey}>
+                      {row[col.accessorKey]}
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
               ))}
-            </Table.Tr>
-          ))}
-        </Table.Thead>
-        <Table.Tbody>
-          {table.getRowModel().rows.map((row) => (
-            <Table.Tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <Table.Td key={cell.id}>
-                  {/* eslint-disable-next-line react/jsx-pascal-case */}
-                  <MRT_TableBodyCellValue cell={cell} table={table} />
-                </Table.Td>
-              ))}
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {/* eslint-disable-next-line react/jsx-pascal-case */}
-      <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-    </Stack>
+            </Table.Tbody>
+          </Table>
+        </div>
+      </Stack>
+    </Paper>
   );
 }
 
 CustomTable.propTypes = {
-  data: PropTypes.arrayOf({
-    [PropTypes.string]: PropTypes,
-  }).isRequired,
+  data: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       accessorKey: PropTypes.string.isRequired,
       header: PropTypes.string.isRequired,
     }),
   ).isRequired,
+  TableName: PropTypes.string,
 };
 
 export default CustomTable;
