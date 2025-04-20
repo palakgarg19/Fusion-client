@@ -1,6 +1,14 @@
 import { useState, Suspense, lazy, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Box, Paper, Select, Group, Text } from "@mantine/core";
+import {
+  Box,
+  Paper,
+  Select,
+  Group,
+  Text,
+  Badge,
+  SimpleGrid,
+} from "@mantine/core";
 import dayjs from "dayjs";
 import { useMediaQuery } from "@mantine/hooks";
 import ModuleTabs from "../../components/moduleTabs";
@@ -102,65 +110,1066 @@ function GymkhanaDashboard() {
             <Paper
               shadow="md"
               p="xl"
-              h="80vh"
-              w="80vw"
-              ml="20px"
-              style={{ overflow: "scroll" }}
+              style={{
+                height: "80vh",
+                overflow: "auto",
+                width: "100%", // Changed from 80vw
+                maxWidth: "1200px", // Optional max-width for larger screens
+                margin: "10px auto", // Centered with small margin
+              }}
             >
-              {/* Club Information Content */}
-              <Box w="70vw">
-                <h4>Brief Information regarding Clubs...</h4>
-                <Text mt="5px" size={isMobile ? "sm" : "md"}>
-                  <span style={{ fontWeight: 900 }}>Clubs Cultural Club:</span>
-                  The Institute has vibrant Cultural Clubs that provide a
-                  platform for students to showcase their creativity and talent.
-                  talent. There are six clubs associated with our cultural
-                  fraternity, namely: (i) Saaz (Music Club), (ii) Jazbaat
-                  (Dramatics Society Club), (iii) Aavartan (Dance Club), (iv)
-                  Abhivayakti (Arts & Craft Club), (v) Aakrti (The Film Making &
-                  Photography Club), and (vi) Samvaad (Literature & Quizzing
-                  Society Club). The activities of the cultural committee are
-                  largely student-driven with proper guidance from faculty
-                  members. These clubs are active throughout the year. Besides
-                  helping students in honing their talent and skills, they
-                  organize their respective annual festivals.
-                </Text>
-                <Text mt="5px" size={isMobile ? "sm" : "md"}>
-                  <span style={{ fontWeight: 900 }}>
-                    Science & Technology Club
-                  </span>
-                  :There are in all 7 different Science and Technology Clubs
-                  which are mentored separately by Faculty Members. Since the
-                  inception of the Institute, the technical fest “Abhikalpan”
-                  held annually is a popular event among different colleges of
-                  Jabalpur and the surrounding regions. Apart from that,
-                  Hackathon, Racing, Programming, Electronics, 3D priniting,
-                  Business and Management, Fabrication and Astronomy related
-                  events are organized throughout the year.
-                </Text>
-                <Text mt="5px" size={isMobile ? "sm" : "md"}>
-                  <span style={{ fontWeight: 900 }}>Sports Club:</span>Sports
-                  and games play a major role in keeping a person fit and fine.
-                  Sports in general inculcates, team work, mental strength and
-                  physical fitness along with ethics, respect to the opponent,
-                  fair play in real life aspects as well. Truly said! At IIITDM
-                  Jabalpur, we provide facilities for students to experience
-                  “above and beyond” academic experience, to maintain their
-                  physical fitness and to excel as a bright student. IIITDM
-                  Jabalpur has excellent infrastructure facilities for both
-                  outdoor and indoor games and sports. The outdoor games include
-                  Volley Ball, Foot Ball, and Cricket, Lawn Tennis, Basket Ball
-                  and Athletic ground. A Flood light facility is provided for
-                  outdoor games like volleyball, lawn tennis, basketball and
-                  Football. The Indoor-Students Activity Center (SAC) provides
-                  the following facilities: Shuttle Badminton, Chess, Caroms and
-                  Table Tennis with wooden flooring, and other multi-Gyms
-                  activities. We are preparing students by organizing intramural
-                  and extramural competitions. We encourage student
-                  participation in inter-collegiate, inter-IIIT and other open
-                  tournaments across the country.
-                </Text>
+              {/* Science & Tech Clubs Content */}
+              <Box mb="xl" px="sm">
+                <h2
+                  style={{
+                    borderBottom: "2px solid #e67700",
+                    paddingBottom: "8px",
+                  }}
+                >
+                  Science & Technology Clubs
+                </h2>
               </Box>
+              {/* Card Grid - 3 columns */}
+              <SimpleGrid
+                cols={3}
+                spacing="lg"
+                breakpoints={[
+                  { maxWidth: "992px", cols: 2 }, // Tablet breakpoint
+                  { maxWidth: "576px", cols: 1 }, // Mobile breakpoint
+                ]}
+              >
+                <Box
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "1rem",
+                    padding: "0 1rem",
+                  }}
+                >
+                  {/* Cards here */}
+                  {/* 1. Programming Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200, // Increased height for better content visibility
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/programming.png"
+                          alt="Programming Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          The Programming Club
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        The byte-sized problem solvers! We host weekly coding
+                        contests, hackathons, and open-source contribution
+                        drives. Our teams have won ACM-ICPC regionals and
+                        developed apps used by 10,000+ students.
+                      </Text>
+                      <Text size="sm" mt="md">
+                        <b>Facilities:</b> 24/7 coding lab with high-performance
+                        machines
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 2. Business & Management Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/business.png"
+                          alt="Business Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Business & Management Club
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Future CEOs in the making! We organize case study
+                        competitions, startup mentorship programs, and investor
+                        pitch simulations. Our annual "BizTech Summit" attracts
+                        industry leaders.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 3. Astronomy & Physics Society */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/telescope.png"
+                          alt="Astronomy Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Astronomy & Physics Society
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Exploring the universe one star at a time. We host
+                        telescope nights, astrophysics lectures, and participate
+                        in international astronomy olympiads. Our radio
+                        telescope project won NASA's Space Apps Challenge.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 4. Aero Fabrication Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/airplane.png"
+                          alt="Aero Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Aero Fabrication Club
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Building the future of flight. Members design drones, RC
+                        planes, and compete in international competitions like
+                        SAE Aero Design. Our solar-powered UAV achieved 8 hours
+                        continuous flight.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 5. Robotics Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/robot-2.png"
+                          alt="Robotics Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Robotics Club
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Where machines come to life! We build combat robots,
+                        autonomous rovers, and compete in ABU Robocon. Our
+                        humanoid robot "Jarvis" won 2nd place in the National
+                        Robotics Championship.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 6. Racing Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png"
+                          alt="Racing Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Racing Club
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Engineering speed demons! We design formula-style race
+                        cars for Formula Student. Our EV "VoltX" achieves 0-100
+                        kmph in 3.2 seconds.
+                      </Text>
+                    </Box>
+                  </Paper>
+                </Box>
+              </SimpleGrid>
+
+              <Box mb="xl">
+                <h2
+                  style={{
+                    borderBottom: "2px solid #228be6",
+                    paddingBottom: "8px",
+                  }}
+                >
+                  Cultural Clubs
+                </h2>
+              </Box>
+
+              <SimpleGrid
+                cols={3}
+                spacing="lg"
+                breakpoints={[
+                  { maxWidth: "992px", cols: 2 }, // Tablet breakpoint
+                  { maxWidth: "576px", cols: 1 }, // Mobile breakpoint
+                ]}
+              >
+                <Box
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "1rem",
+                    padding: "0 1rem",
+                  }}
+                >
+                  {/* 1. Saaz - Music Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          Saaz
+                        </Text>
+                        <Badge color="blue" variant="light">
+                          Music
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/music.png"
+                          alt="Music Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        The melody makers of campus! From classical to rock, our
+                        bands perform at college events and compete nationally.
+                        Hosts annual 'Swarangan' festival.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 2. Jazbaat - Dramatics */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          Jazbaat
+                        </Text>
+                        <Badge color="red" variant="light">
+                          Dramatics
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/drama.png"
+                          alt="Drama Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Where stories come alive! Specializes in street plays
+                        and annual productions. Won 5 inter-college competitions
+                        last year.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 3. Aavartan - Dance */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          Aavartan
+                        </Text>
+                        <Badge color="violet" variant="light">
+                          Dance
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/dancing-party.png"
+                          alt="Dance Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        From Kathak to hip-hop, our award-winning troupe
+                        performs at major events. National champions in
+                        contemporary dance (2023).
+                      </Text>
+                    </Box>
+                  </Paper>
+                  {/* 4. Samvaad - Literary */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          Samvaad
+                        </Text>
+                        <Badge color="orange" variant="light">
+                          Literary
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/literature.png"
+                          alt="Literary Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Hosts poetry slams and debate competitions. Publishes
+                        annual magazine "Vachan". Debate team reached national
+                        finals 3 years running.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 5. ShutterBox - Photography */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          ShutterBox
+                        </Text>
+                        <Badge color="grape" variant="light">
+                          Photography
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/compact-camera.png"
+                          alt="Photography Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        From DSLR workshops to short film competitions. Annual
+                        "Frame Fest" showcases student work. Alumni at National
+                        Geographic.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 6. Abhivyakti - Arts */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" noWrap>
+                      <Group spacing="xs" align="center">
+                        <Text size="xl" fw={700}>
+                          Abhivyakti
+                        </Text>
+                        <Badge color="green" variant="light">
+                          Art & Craft
+                        </Badge>
+                      </Group>
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/paint-palette.png"
+                          alt="Art Club Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Weekly pottery and sketching sessions. Annual art
+                        auction funds scholarships. Mural paintings across
+                        campus.
+                      </Text>
+                    </Box>
+                  </Paper>
+                </Box>
+              </SimpleGrid>
+              <Box mb="xl">
+                <h2
+                  style={{
+                    borderBottom: "2px solid #40c057",
+                    paddingBottom: "8px",
+                  }}
+                >
+                  Sports Clubs
+                </h2>
+              </Box>
+
+              <SimpleGrid
+                cols={3}
+                spacing="lg"
+                breakpoints={[
+                  { maxWidth: "992px", cols: 2 }, // Tablet breakpoint
+                  { maxWidth: "576px", cols: 1 }, // Mobile breakpoint
+                ]}
+              >
+                <Box
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "1rem",
+                    padding: "0 1rem",
+                  }}
+                >
+                  {/* Cards here */}
+                  {/* 1. Cricket Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/cricket.png"
+                          alt="Cricket Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Cricket
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        The willow warriors! 3-time inter-university champions
+                        with professional coaching and annual "Boundary Kings"
+                        tournament.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 2. Athletics Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/sprint.png"
+                          alt="Athletics Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Athletics
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Speed, strength and stamina! Our athletes hold 15
+                        college records. Hosts the annual "Thunder Run"
+                        marathon.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 3. Badminton Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/badminton.png"
+                          alt="Badminton Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Badminton
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        6 wood-floor courts with professional lighting. Weekly
+                        doubles tournaments and "Shuttle Premier League".
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 4. Basketball Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/basketball.png"
+                          alt="Basketball Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Basketball
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Floodlit courts with NBA-standard flooring. Compete in
+                        our 3x3 streetball tournament and inter-college league.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 5. Lawn Tennis Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/tennis.png"
+                          alt="Tennis Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Lawn Tennis
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        Clay and grass courts available. Annual "Racket Royale"
+                        tournament with players from 20+ colleges.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 6. Table Tennis Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/ping-pong.png"
+                          alt="Table Tennis Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Table Tennis
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        8 professional tables with tournament-grade flooring.
+                        Weekly round-robin matches and championships.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 7. Football Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/soccer.png"
+                          alt="Football Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Football
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        FIFA-standard turf with floodlights. 7-a-side league and
+                        annual "Golden Boot" tournament. Women's team available.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 8. Volleyball Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/volleyball.png"
+                          alt="Volleyball Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Volleyball
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        4 professional courts (2 indoor). Beach volleyball
+                        training. Reigning state university champions.
+                      </Text>
+                    </Box>
+                  </Paper>
+
+                  {/* 9. Kabaddi Club */}
+                  <Paper
+                    withBorder
+                    p="lg"
+                    shadow="sm"
+                    style={{
+                      height: 200,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Group position="apart" align="flex-start">
+                      <Box style={{ width: 30, height: 30 }}>
+                        <img
+                          src="https://img.icons8.com/color/96/kabaddi.png"
+                          alt="Kabaddi Logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size="xl" fw={700}>
+                          Kabaddi
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Box
+                      style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        marginTop: 16,
+                        paddingRight: 8,
+                      }}
+                    >
+                      <Text size="sm">
+                        National-level players. Professional mat arena. Compete
+                        in Pro Kabaddi League scouting tournaments.
+                      </Text>
+                    </Box>
+                  </Paper>
+                </Box>
+              </SimpleGrid>
             </Paper>
           ) : (
             <Suspense fallback={<div>Loading .......</div>}>
